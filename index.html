@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة نظام الإنذار المبكر متعدد المخاطر (MHEWS) - MoEDM & UNOPS</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Cairo & Tajawal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        emeraldDeep: '#0B4F32',
+                        emeraldMid: '#146B44',
+                        emeraldLight: '#E8F3EE',
+                        goldPrimary: '#C59B27',
+                        goldLight: '#D4AF37',
+                        goldPale: '#FBF7E8',
+                        creamBg: '#F9F8F3'
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                        tajawal: ['Tajawal', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: #F9F8F3;
+            color: #1F2937;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F9F8F3;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #146B44;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0B4F32;
+        }
+        .gold-border-gradient {
+            border-image: linear-gradient(to left, #C59B27, #D4AF37, #C59B27) 1;
+        }
+        .tab-btn.active {
+            background-color: #0B4F32;
+            color: #FFFFFF;
+            border-bottom: 4px solid #D4AF37;
+            box-shadow: 0 4px 12px rgba(11, 79, 50, 0.25);
+        }
+        .hazard-btn.active {
+            background-color: #C59B27;
+            color: #FFFFFF;
+            border-color: #0B4F32;
+        }
+        .fade-in {
+            animation: fadeIn 0.35s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-goldPrimary selection:text-white">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 left-6 z-50 hidden bg-emeraldDeep text-white px-6 py-4 rounded-xl shadow-2xl border-2 border-goldLight flex items-center gap-3 transition-all duration-300">
+        <i class="fa-solid fa-circle-check text-goldLight text-2xl"></i>
+        <div>
+            <h4 id="toast-title" class="font-bold text-sm">تم تجهيز الملف بنجاح</h4>
+            <p id="toast-msg" class="text-xs text-gray-200">جاري تحميل ملف الوورد...</p>
+        </div>
+    </div>
+
+    <!-- Official Header -->
+    <header class="bg-gradient-to-l from-emeraldDeep via-emeraldMid to-emeraldDeep text-white border-b-4 border-goldPrimary shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-2xl bg-white/10 border-2 border-goldLight flex items-center justify-center shadow-inner shrink-0">
+                        <i class="fa-solid fa-shield-halved text-goldLight text-3xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2 mb-1">
+                            <span class="bg-goldPrimary text-emeraldDeep font-extrabold text-xs px-3 py-1 rounded-full uppercase tracking-wider">UNOPS Assignment</span>
+                            <span class="bg-white/15 text-goldPale text-xs px-3 py-1 rounded-full border border-goldLight/40">وزارة الطوارئ وإدارة الكوارث في سوريا (MoEDM)</span>
+                        </div>
+                        <h1 class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-white">
+                            بوابة النظام الوطني للإنذار المبكر متعدد المخاطر (MHEWS)
+                        </h1>
+                        <p class="text-sm text-emeraldLight/90 mt-1">
+                            تطوير العتبات المبنية على الأثر، إجراءات التفعيل القياسية (SOPs)، وتدريب المدربين (ToT) – دمشق
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Quick Download All Trigger -->
+                <div class="flex flex-wrap items-center gap-2 shrink-0">
+                    <button onclick="switchTab('tab-downloads')" class="bg-goldPrimary hover:bg-goldLight text-emeraldDeep font-bold px-4 py-2.5 rounded-xl shadow-md hover:shadow-xl transition flex items-center gap-2 text-sm border border-white/30">
+                        <i class="fa-solid fa-file-word text-lg"></i>
+                        <span>مركز ملفات الوورد (4 وثائق)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs Bar -->
+        <div class="bg-white text-emeraldDeep shadow-sm border-t border-gray-200">
+            <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+                <nav class="flex flex-wrap md:flex-nowrap justify-start md:justify-between overflow-x-auto gap-1 py-2" aria-label="Tabs">
+                    <button onclick="switchTab('tab-summary')" id="btn-tab-summary" class="tab-btn active flex items-center gap-2 px-4 py-3 rounded-lg font-bold text-xs sm:text-sm transition whitespace-nowrap flex-1 justify-center">
+                        <i class="fa-solid fa-clipboard-list text-goldPrimary"></i>
+                        <span>1. ملخص المهمة وخطة العمل</span>
+                    </button>
+                    <button onclick="switchTab('tab-matrix')" id="btn-tab-matrix" class="tab-btn flex items-center gap-2 px-4 py-3 rounded-lg font-bold text-xs sm:text-sm hover:bg-emeraldLight/60 transition whitespace-nowrap flex-1 justify-center">
+                        <i class="fa-solid fa-table-cells text-goldPrimary"></i>
+                        <span>2. مصفوفة (العتبة – الأثر – الإجراء)</span>
+                    </button>
+                    <button onclick="switchTab('tab-scenarios')" id="btn-tab-scenarios" class="tab-btn flex items-center gap-2 px-4 py-3 rounded-lg font-bold text-xs sm:text-sm hover:bg-emeraldLight/60 transition whitespace-nowrap flex-1 justify-center">
+                        <i class="fa-solid fa-people-group text-goldPrimary"></i>
+                        <span>3. سيناريوهات المحاكاة (TTX)</span>
+                    </button>
+                    <button onclick="switchTab('tab-worksheet')" id="btn-tab-worksheet" class="tab-btn flex items-center gap-2 px-4 py-3 rounded-lg font-bold text-xs sm:text-sm hover:bg-emeraldLight/60 transition whitespace-nowrap flex-1 justify-center">
+                        <i class="fa-solid fa-pen-to-square text-goldPrimary"></i>
+                        <span>4. استمارة عمل المتدربين التفاعلية</span>
+                    </button>
+                    <button onclick="switchTab('tab-downloads')" id="btn-tab-downloads" class="tab-btn flex items-center gap-2 px-4 py-3 rounded-lg font-bold text-xs sm:text-sm hover:bg-emeraldLight/60 transition whitespace-nowrap flex-1 justify-center">
+                        <i class="fa-solid fa-cloud-arrow-down text-goldPrimary"></i>
+                        <span>5. مركز تحميل ملفات الوورد</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+
+        <!-- ==========================================
+             TAB 1: SUMMARY & ACTION PLAN
+             ========================================== -->
+        <section id="tab-summary" class="tab-pane fade-in space-y-8">
+            <!-- Section Header Banner -->
+            <div class="bg-white rounded-2xl p-6 shadow-md border-r-8 border-emeraldDeep flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <span class="text-xs font-bold text-goldPrimary uppercase tracking-wider">الوثيقة الأولى</span>
+                    <h2 class="text-2xl font-extrabold text-emeraldDeep mt-1">ملخص المهمة، الروابط المباشرة، وقائمة المهام العملية</h2>
+                    <p class="text-gray-600 text-sm mt-1">كل ما يجب معرفته حول مهمة دعم وزارة الطوارئ وإدارة الكوارث في سوريا (MoEDM) لتفعيل نظام الإنذار المبكر متعدد المخاطر.</p>
+                </div>
+                <button onclick="downloadWordDoc('summary')" class="bg-emeraldDeep hover:bg-emeraldMid text-white font-bold px-5 py-3 rounded-xl shadow-md transition flex items-center gap-2 border-b-4 border-goldPrimary shrink-0">
+                    <i class="fa-solid fa-file-word text-goldLight text-lg"></i>
+                    <span>تحميل الملخص وخطة العمل (Word)</span>
+                </button>
+            </div>
+
+            <!-- Key Highlights Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 hover:border-goldPrimary transition">
+                    <div class="w-12 h-12 rounded-xl bg-emeraldLight text-emeraldDeep flex items-center justify-center mb-4 border border-emeraldDeep/20">
+                        <i class="fa-solid fa-bullseye text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-emeraldDeep text-base mb-2">الهدف والجهة المستفيدة</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">مهمة استشارية وتدريبية مع <strong>UNOPS</strong> لدعم <strong>وزارة الطوارئ وإدارة الكوارث (MoEDM)</strong> في تطوير عتبات الإنذار المبني على الأثر وإجراءات التفعيل لنظام <strong>MHEWS</strong>.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 hover:border-goldPrimary transition">
+                    <div class="w-12 h-12 rounded-xl bg-goldPale text-goldPrimary flex items-center justify-center mb-4 border border-goldPrimary/30">
+                        <i class="fa-solid fa-server text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-emeraldDeep text-base mb-2">المنصة التقنية المعتمدة</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">العمل حصرياً على المنصة القائمة حالياً لدى الوزارة <strong>WMO ClimWeb</strong> وبروتوكول التنبيه المشترك <strong>CAP</strong>. <strong>لا حاجة لبناء أي منصة جديدة.</strong></p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 hover:border-goldPrimary transition">
+                    <div class="w-12 h-12 rounded-xl bg-emeraldLight text-emeraldDeep flex items-center justify-center mb-4 border border-emeraldDeep/20">
+                        <i class="fa-solid fa-chalkboard-user text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-emeraldDeep text-base mb-2">تفاصيل تدريب دمشق</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed"><strong>5 أيام تدريبية في دمشق</strong> (منفصلة عن أيام الاستشارة الفنية)، تستهدف حتى <strong>20 متدرباً</strong> من الكوادر الفنية للوزارة والمؤسسات الوطنية والمتطوعين.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 hover:border-goldPrimary transition">
+                    <div class="w-12 h-12 rounded-xl bg-goldPale text-goldPrimary flex items-center justify-center mb-4 border border-goldPrimary/30">
+                        <i class="fa-solid fa-users-gear text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-emeraldDeep text-base mb-2">تكوين الفريق الاستشاري</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">يتألف الفريق من خبيرين متكاملين: <strong>قائد تقني (Technical Lead)</strong> للعتبات والإجراءات، و<strong>مدرب تدريب مدربين (DRR ToT Trainer)</strong> باللغة العربية.</p>
+                </div>
+            </div>
+
+            <!-- Direct Links & Technical Platforms Table -->
+            <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-200">
+                <div class="bg-emeraldDeep text-white px-6 py-4 flex justify-between items-center border-b-2 border-goldPrimary">
+                    <h3 class="font-bold text-lg flex items-center gap-2">
+                        <i class="fa-solid fa-link text-goldLight"></i>
+                        <span>الأنظمة التقنية المذكورة والروابط المباشرة للخدمات والمرجعيات</span>
+                    </h3>
+                    <span class="text-xs bg-white/10 px-3 py-1 rounded-full text-goldPale">روابط رسمية مباشرة</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right border-collapse">
+                        <thead>
+                            <tr class="bg-emeraldLight/70 text-emeraldDeep border-b border-gray-200 text-sm">
+                                <th class="py-3.5 px-6 font-bold">الخدمة / البروتوكول</th>
+                                <th class="py-3.5 px-6 font-bold">الدور التشغيلي في مشروع سوريا (MoEDM)</th>
+                                <th class="py-3.5 px-6 font-bold">الرابط المباشر للخدمة والتوثيق</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 text-sm">
+                            <tr class="hover:bg-goldPale/30 transition">
+                                <td class="py-4 px-6 font-bold text-emeraldDeep">منصة WMO ClimWeb</td>
+                                <td class="py-4 px-6 text-gray-700">نظام إدارة محتوى خدمات الأرصاد والمناخ التابع للمنظمة العالمية للأرصاد الجوية؛ يُستخدم لعرض معلومات المخاطر، رسم الخرائط، وتوليد ونشر التحذيرات.</td>
+                                <td class="py-4 px-6">
+                                    <a href="https://climweb.readthedocs.io/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 bg-emeraldLight text-emeraldDeep hover:bg-emeraldDeep hover:text-white px-3 py-1.5 rounded-lg font-semibold transition text-xs">
+                                        <span>دليل منصة ClimWeb الرسمي</span>
+                                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-goldPale/30 transition">
+                                <td class="py-4 px-6 font-bold text-emeraldDeep">بروتوكول التنبيه المشترك (CAP v1.2)</td>
+                                <td class="py-4 px-6 text-gray-700">المعيار الرقمي الدولي (OASIS / WMO) بصيغة XML لتبادل وتعميم تحذيرات الطوارئ والإنذار المبكر عبر كافة القنوات.</td>
+                                <td class="py-4 px-6">
+                                    <a href="https://docs.oasis-open.org/emergency/cap/v1.2/CAP-v1.2-os.html" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 bg-emeraldLight text-emeraldDeep hover:bg-emeraldDeep hover:text-white px-3 py-1.5 rounded-lg font-semibold transition text-xs">
+                                        <span>مواصفات بروتوكول CAP القياسية</span>
+                                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-goldPale/30 transition">
+                                <td class="py-4 px-6 font-bold text-emeraldDeep">مبادرة الإنذار المبكر للجميع (EW4All - WMO)</td>
+                                <td class="py-4 px-6 text-gray-700">الإطار المرجعي للمنظمة العالمية للأرصاد الجوية لتطوير أنظمة الإنذار المبكر متعددة المخاطر (MHEWS) والعتبات المبنية على الأثر.</td>
+                                <td class="py-4 px-6">
+                                    <a href="https://wmo.int/activities/early-warnings-all" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 bg-emeraldLight text-emeraldDeep hover:bg-emeraldDeep hover:text-white px-3 py-1.5 rounded-lg font-semibold transition text-xs">
+                                        <span>بوابة WMO للإنذار المبكر</span>
+                                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-goldPale/30 transition">
+                                <td class="py-4 px-6 font-bold text-emeraldDeep">بوابة UNOPS للوظائف والمشاريع</td>
+                                <td class="py-4 px-6 text-gray-700">البوابة الرسمية لمكتب الأمم المتحدة لخدمات المشاريع المشرف على التعاقد وإدارة المهمة الاستشارية والتدريبية.</td>
+                                <td class="py-4 px-6">
+                                    <a href="https://jobs.unops.org/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 bg-goldPale text-emeraldDeep hover:bg-goldPrimary hover:text-white px-3 py-1.5 rounded-lg font-semibold transition text-xs border border-goldPrimary/40">
+                                        <span>بوابة UNOPS الرسمية</span>
+                                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Action Plan & Checklists -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Technical Lead Tasks -->
+                <div class="bg-white rounded-2xl shadow-md border-t-4 border-emeraldDeep p-6">
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <span class="w-10 h-10 rounded-xl bg-emeraldDeep text-goldLight flex items-center justify-center font-bold">1</span>
+                            <div>
+                                <h3 class="font-extrabold text-emeraldDeep text-base">مهام القائد التقني (Technical Lead)</h3>
+                                <p class="text-xs text-gray-500">MHEWS Operational Thresholds, Early Warning & SOPs Specialist</p>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-start gap-3 p-3 rounded-xl bg-creamBg hover:bg-emeraldLight/40 transition">
+                            <input type="checkbox" checked class="mt-1 w-4 h-4 accent-emeraldDeep rounded cursor-pointer">
+                            <div>
+                                <span class="font-bold text-emeraldDeep block">تطوير واعتماد العتبات التشغيلية للمخاطر الستة:</span>
+                                <span class="text-gray-600 text-xs">الجفاف، السيول والفيضانات المفاجئة، حرائق الغابات، العواصف الرملية والترابية، موجات الحر، والعواصف الرياحية.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3 p-3 rounded-xl bg-creamBg hover:bg-emeraldLight/40 transition">
+                            <input type="checkbox" checked class="mt-1 w-4 h-4 accent-emeraldDeep rounded cursor-pointer">
+                            <div>
+                                <span class="font-bold text-emeraldDeep block">إنتاج مصفوفة (العتبة – الأثر – الإجراء):</span>
+                                <span class="text-gray-600 text-xs">تصميم المصفوفة لمستويات التحذير الأربعة (الأزرق، الأصفر، البرتقالي، والأحمر).</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3 p-3 rounded-xl bg-creamBg hover:bg-emeraldLight/40 transition">
+                            <input type="checkbox" checked class="mt-1 w-4 h-4 accent-emeraldDeep rounded cursor-pointer">
+                            <div>
+                                <span class="font-bold text-emeraldDeep block">صياغة دليل تفعيل الإنذار المبكر وإجراءات التشغيل (SOPs):</span>
+                                <span class="text-gray-600 text-xs">تحديد محفزات التفعيل، المسؤوليات المؤسسية، آليات التصعيد، ونشر التحذيرات.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3 p-3 rounded-xl bg-creamBg hover:bg-emeraldLight/40 transition">
+                            <input type="checkbox" checked class="mt-1 w-4 h-4 accent-emeraldDeep rounded cursor-pointer">
+                            <div>
+                                <span class="font-bold text-emeraldDeep block">المواءمة التقنية مع ClimWeb و CAP:</span>
+                                <span class="text-gray-600 text-xs">ضمان توافق مسارات العمل مع المنصة الحالية وتقديم عرض عملي لها والمشاركة في تقديم الجلسات الفنية.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- DRR ToT Trainer Tasks -->
+                <div class="bg-white rounded-2xl shadow-md border-t-4 border-goldPrimary p-6">
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <span class="w-10 h-10 rounded-xl bg-goldPrimary text-white flex items-center justify-center font-bold">2</span>
+                            <div>
+                                <h3 class="font-extrabold text-emeraldDeep text-base">مهام مدرب تدريب المدربين (DRR ToT Trainer)</h3>
+                                <p class="text-xs text-gray-500">Disaster Risk Reduction & Community Preparedness ToT Trainer</p>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-start gap-3 p-3 rounded-xl bg-creamBg hover:bg-goldPale/60 transition">
+                            <input type="checkbox" checked class="mt-1 w-4 h-4 accent-emeraldDeep rounded cursor-pointer">
+                            <div>
+                                <span class="font-bold text-emeraldDeep block">تصميم وقيادة برنامج تدريب المدربين (ToT) بالعربية:</span>
+                                <span class="text-gray-600 text-xs">إعداد الحقيبة التدريبية المتكاملة وقيادة التدريب لمدة 5 أيام في دمشق لـ 20 مشاركاً.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3 p-3 rounded-xl bg-creamBg hover:bg-goldPale/60 transition">
+                            <input type="checkbox" checked class="mt-1 w-4 h-4 accent-emeraldDeep rounded cursor-pointer">
+                            <div>
+                                <span class="font-bold text-emeraldDeep block">بناء سيناريوهات محاكاة سورية عملية:</span>
+                                <span class="text-gray-600 text-xs">تحويل العتبات وSOPs إلى سيناريوهات تغطي تفسير التحذيرات، إبلاغ المخاطر، الاستعداد، والعمل الاستباقي.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3 p-3 rounded-xl bg-creamBg hover:bg-goldPale/60 transition">
+                            <input type="checkbox" checked class="mt-1 w-4 h-4 accent-emeraldDeep rounded cursor-pointer">
+                            <div>
+                                <span class="font-bold text-emeraldDeep block">تنفيذ تمارين ClimWeb و CAP وتقييم الكفاءات:</span>
+                                <span class="text-gray-600 text-xs">إجراء التقييم القبلي والبعدي (Pre/Post Test) وتقييم الكفاءة العملي للمتدربين بالتعاون مع القائد التقني.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3 p-3 rounded-xl bg-creamBg hover:bg-goldPale/60 transition">
+                            <input type="checkbox" checked class="mt-1 w-4 h-4 accent-emeraldDeep rounded cursor-pointer">
+                            <div>
+                                <span class="font-bold text-emeraldDeep block">قيادة توصيات المشاركة المجتمعية:</span>
+                                <span class="text-gray-600 text-xs">تطوير التوصيات العملية لإشراك المجتمعات المحلية والمتطوعين في منظومة الإنذار والاستجابة.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             TAB 2: THRESHOLD - IMPACT - ACTION MATRIX
+             ========================================== -->
+        <section id="tab-matrix" class="tab-pane hidden fade-in space-y-8">
+            <div class="bg-white rounded-2xl p-6 shadow-md border-r-8 border-goldPrimary flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <span class="text-xs font-bold text-goldPrimary uppercase tracking-wider">الوثيقة الثانية</span>
+                    <h2 class="text-2xl font-extrabold text-emeraldDeep mt-1">مصفوفة (العتبة – الأثر – الإجراء) للمخاطر الستة</h2>
+                    <p class="text-gray-600 text-sm mt-1">المستويات اللونية الأربعة (الأزرق، الأصفر، البرتقالي، الأحمر) متوافقة مع معايير التنبؤ المبني على الأثر وحقول بروتوكول CAP في منصة ClimWeb.</p>
+                </div>
+                <button onclick="downloadWordDoc('matrix')" class="bg-emeraldDeep hover:bg-emeraldMid text-white font-bold px-5 py-3 rounded-xl shadow-md transition flex items-center gap-2 border-b-4 border-goldPrimary shrink-0">
+                    <i class="fa-solid fa-file-word text-goldLight text-lg"></i>
+                    <span>تحميل المصفوفة الكاملة (Word)</span>
+                </button>
+            </div>
+
+            <!-- CAP Protocol Mapping Overview Table -->
+            <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-200">
+                <div class="bg-emeraldDeep text-white px-6 py-3.5 flex justify-between items-center border-b-2 border-goldPrimary">
+                    <h3 class="font-bold text-base flex items-center gap-2">
+                        <i class="fa-solid fa-code-branch text-goldLight"></i>
+                        <span>الإطار العام لمستويات التحذير الأربعة وموائمتها مع بروتوكول CAP</span>
+                    </h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-emeraldDeep border-b border-gray-200">
+                                <th class="py-3 px-4 font-bold">المستوى اللوني</th>
+                                <th class="py-3 px-4 font-bold">حالة التأهب</th>
+                                <th class="py-3 px-4 font-bold">شدة CAP (Severity)</th>
+                                <th class="py-3 px-4 font-bold">الاستعجال (Urgency)</th>
+                                <th class="py-3 px-4 font-bold">الموثوقية (Certainty)</th>
+                                <th class="py-3 px-4 font-bold">الهدف التشغيلي العام</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr class="bg-blue-50/70">
+                                <td class="py-3 px-4 font-bold text-blue-900"><span class="inline-block w-3 h-3 rounded-full bg-blue-600 ml-2"></span>الأزرق (Blue)</td>
+                                <td class="py-3 px-4 font-semibold">مراقبة وتنبيه أولي</td>
+                                <td class="py-3 px-4 font-mono text-xs">Minor</td>
+                                <td class="py-3 px-4 font-mono text-xs">Future</td>
+                                <td class="py-3 px-4 font-mono text-xs">Possible</td>
+                                <td class="py-3 px-4">رصد مؤشرات أولية؛ تنبيه داخلي للكوادر الفنية ومراجعة الجاهزية.</td>
+                            </tr>
+                            <tr class="bg-yellow-50/80">
+                                <td class="py-3 px-4 font-bold text-yellow-900"><span class="inline-block w-3 h-3 rounded-full bg-yellow-500 ml-2"></span>الأصفر (Yellow)</td>
+                                <td class="py-3 px-4 font-semibold">تحذير مبكر (كن مستعداً)</td>
+                                <td class="py-3 px-4 font-mono text-xs">Moderate</td>
+                                <td class="py-3 px-4 font-mono text-xs">Expected</td>
+                                <td class="py-3 px-4 font-mono text-xs">Likely</td>
+                                <td class="py-3 px-4">مخاطر محتملة محلياً؛ إخطار المؤسسات المعنية وتوعية الجمهور بالحذر.</td>
+                            </tr>
+                            <tr class="bg-orange-50/80">
+                                <td class="py-3 px-4 font-bold text-orange-900"><span class="inline-block w-3 h-3 rounded-full bg-orange-500 ml-2"></span>البرتقالي (Orange)</td>
+                                <td class="py-3 px-4 font-semibold">تأهب قصوى (اتخذ إجراءً)</td>
+                                <td class="py-3 px-4 font-mono text-xs">Severe</td>
+                                <td class="py-3 px-4 font-mono text-xs">Expected</td>
+                                <td class="py-3 px-4 font-mono text-xs">Observed / Likely</td>
+                                <td class="py-3 px-4">مخاطر شديدة متوقعة؛ تفعيل غرف العمليات، تعليق بعض الأنشطة، وتحرك استباقي.</td>
+                            </tr>
+                            <tr class="bg-red-50/80">
+                                <td class="py-3 px-4 font-bold text-red-900"><span class="inline-block w-3 h-3 rounded-full bg-red-600 ml-2"></span>الأحمر (Red)</td>
+                                <td class="py-3 px-4 font-semibold">طوارئ قصوى (خطر على الحياة)</td>
+                                <td class="py-3 px-4 font-mono text-xs">Extreme</td>
+                                <td class="py-3 px-4 font-mono text-xs">Immediate</td>
+                                <td class="py-3 px-4 font-mono text-xs">Observed</td>
+                                <td class="py-3 px-4">خطر كارثي وشيك أو جارٍ؛ إخلاء فوري، تعبئة شاملة، وتدخل فرق الإنقاذ.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Hazard Filter Buttons -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                    <span class="text-sm font-bold text-emeraldDeep flex items-center gap-2">
+                        <i class="fa-solid fa-filter text-goldPrimary"></i>
+                        <span>تصفية حسب نوع الخطر:</span>
+                    </span>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterHazard('all')" id="haz-btn-all" class="hazard-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border border-gray-300 transition">عرض جميع المخاطر الستة</button>
+                    <button onclick="filterHazard('floods')" id="haz-btn-floods" class="hazard-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border border-gray-300 bg-creamBg hover:bg-goldPale transition">1. السيول والفيضانات</button>
+                    <button onclick="filterHazard('drought')" id="haz-btn-drought" class="hazard-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border border-gray-300 bg-creamBg hover:bg-goldPale transition">2. الجفاف</button>
+                    <button onclick="filterHazard('wildfires')" id="haz-btn-wildfires" class="hazard-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border border-gray-300 bg-creamBg hover:bg-goldPale transition">3. حرائق الغابات</button>
+                    <button onclick="filterHazard('dust')" id="haz-btn-dust" class="hazard-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border border-gray-300 bg-creamBg hover:bg-goldPale transition">4. العواصف الرملية والترابية</button>
+                    <button onclick="filterHazard('heatwaves')" id="haz-btn-heatwaves" class="hazard-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border border-gray-300 bg-creamBg hover:bg-goldPale transition">5. موجات الحر</button>
+                    <button onclick="filterHazard('windstorms')" id="haz-btn-windstorms" class="hazard-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border border-gray-300 bg-creamBg hover:bg-goldPale transition">6. العواصف الرياحية</button>
+                </div>
+            </div>
+
+            <!-- Dynamic Hazards Container -->
+            <div id="hazards-container" class="space-y-6"></div>
+        </section>
+
+        <!-- ==========================================
+             TAB 3: TABLETOP SIMULATION SCENARIOS (TTX)
+             ========================================== -->
+        <section id="tab-scenarios" class="tab-pane hidden fade-in space-y-8">
+            <div class="bg-white rounded-2xl p-6 shadow-md border-r-8 border-emeraldDeep flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <span class="text-xs font-bold text-goldPrimary uppercase tracking-wider">الوثيقة الثالثة</span>
+                    <h2 class="text-2xl font-extrabold text-emeraldDeep mt-1">سيناريوهات المحاكاة التدريبية المكتبية (Tabletop Exercises - TTX)</h2>
+                    <p class="text-gray-600 text-sm mt-1">ثلاثة سيناريوهات سورية واقعية متدرجة المراحل لتدريب الـ 20 مشاركاً في دمشق على تطبيق المصفوفة ومنصة ClimWeb وبروتوكول CAP.</p>
+                </div>
+                <button onclick="downloadWordDoc('scenarios')" class="bg-emeraldDeep hover:bg-emeraldMid text-white font-bold px-5 py-3 rounded-xl shadow-md transition flex items-center gap-2 border-b-4 border-goldPrimary shrink-0">
+                    <i class="fa-solid fa-file-word text-goldLight text-lg"></i>
+                    <span>تحميل دليل السيناريوهات (Word)</span>
+                </button>
+            </div>
+
+            <!-- Trainer Instructions Box -->
+            <div class="bg-gradient-to-l from-emeraldDeep to-emeraldMid text-white rounded-2xl p-6 shadow-md border-b-4 border-goldPrimary">
+                <h3 class="font-bold text-lg text-goldLight mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-compass-drafting"></i>
+                    <span>آلية إدارة التمرين وتوزيع المجموعات الأربع (20 متدرباً)</span>
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs sm:text-sm">
+                    <div class="bg-white/10 p-3.5 rounded-xl border border-white/15">
+                        <strong class="text-goldLight block mb-1">المجموعة 1: الرصد والتنبؤ</strong>
+                        قراءة المؤشرات الفنية وتحديث طبقات الخرائط على منصة ClimWeb.
+                    </div>
+                    <div class="bg-white/10 p-3.5 rounded-xl border border-white/15">
+                        <strong class="text-goldLight block mb-1">المجموعة 2: صياغة CAP والإعلام</strong>
+                        إعداد حقول بروتوكول CAP وصياغة الرسائل المؤسسية والمجتمعية.
+                    </div>
+                    <div class="bg-white/10 p-3.5 rounded-xl border border-white/15">
+                        <strong class="text-goldLight block mb-1">المجموعة 3: غرفة عمليات الطوارئ</strong>
+                        إدارة التنسيق المؤسسي، قرارات التصعيد، وإجراءات الحماية الميدانية.
+                    </div>
+                    <div class="bg-white/10 p-3.5 rounded-xl border border-white/15">
+                        <strong class="text-goldLight block mb-1">المجموعة 4: الاستعداد المجتمعي</strong>
+                        توجيه المتطوعين، حماية الفئات الهشة والمخيمات، وتنفيذ العمل الاستباقي.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scenarios Container -->
+            <div id="scenarios-container" class="space-y-8"></div>
+
+            <!-- Competency Evaluation Checklist -->
+            <div class="bg-white rounded-2xl p-6 shadow-md border border-goldPrimary/40">
+                <h3 class="font-extrabold text-emeraldDeep text-lg mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-award text-goldPrimary"></i>
+                    <span>بطاقة تقييم كفاءة المتدربين خلال المحاكاة (Competency Checklist)</span>
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                    <div class="p-4 rounded-xl bg-creamBg border-r-4 border-emeraldDeep">
+                        <h4 class="font-bold text-emeraldDeep mb-1">1. دقة القرار الفني</h4>
+                        <p class="text-xs text-gray-600">مطابقة المستوى اللوني المختار مع الأرقام الواردة في العتبات لكل مرحلة.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-creamBg border-r-4 border-goldPrimary">
+                        <h4 class="font-bold text-emeraldDeep mb-1">2. التكامل مع ClimWeb و CAP</h4>
+                        <p class="text-xs text-gray-600">سلامة اختيار قيم Severity و Urgency و Certainty دون تعارض منطقي.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-creamBg border-r-4 border-emeraldDeep">
+                        <h4 class="font-bold text-emeraldDeep mb-1">3. وضوح رسائل الإبلاغ</h4>
+                        <p class="text-xs text-gray-600">شمولية الرسالة لنوع الخطر، المنطقة، التوقيت، الأثر المتوقع، والإجراء المطلوب.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-creamBg border-r-4 border-goldPrimary">
+                        <h4 class="font-bold text-emeraldDeep mb-1">4. العمل الاستباقي</h4>
+                        <p class="text-xs text-gray-600">تفعيل إجراءات وقائية استباقية في المرحلتين الصفراء والبرتقالية قبل وقوع الكارثة.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             TAB 4: INTERACTIVE TRAINEE WORKSHEET
+             ========================================== -->
+        <section id="tab-worksheet" class="tab-pane hidden fade-in space-y-8">
+            <div class="bg-white rounded-2xl p-6 shadow-md border-r-8 border-goldPrimary flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <span class="text-xs font-bold text-goldPrimary uppercase tracking-wider">الوثيقة الرابعة (نموذج تطبيقي تفاعلي)</span>
+                    <h2 class="text-2xl font-extrabold text-emeraldDeep mt-1">استمارة عمل المتدربين: تمرين محاكاة تفعيل نظام الإنذار المبكر (MHEWS)</h2>
+                    <p class="text-gray-600 text-sm mt-1">يمكنك تعبئة النموذج مباشرة وتجربة توليد كود CAP XML، أو تحميل الاستمارة الفارغة/المعبأة كملف وورد مستقل جاهز للطباعة.</p>
+                </div>
+                <div class="flex flex-wrap gap-2 shrink-0">
+                    <button onclick="downloadWordDoc('worksheet_blank')" class="bg-emeraldDeep hover:bg-emeraldMid text-white font-bold px-4 py-3 rounded-xl shadow-md transition flex items-center gap-2 border-b-4 border-goldPrimary text-xs sm:text-sm">
+                        <i class="fa-solid fa-file-word text-goldLight"></i>
+                        <span>تحميل الاستمارة الفارغة (Word)</span>
+                    </button>
+                    <button onclick="downloadWordDoc('worksheet_filled')" class="bg-goldPrimary hover:bg-goldLight text-emeraldDeep font-extrabold px-4 py-3 rounded-xl shadow-md transition flex items-center gap-2 text-xs sm:text-sm">
+                        <i class="fa-solid fa-file-export"></i>
+                        <span>تحميل الاستمارة بعد التعبئة (Word)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Interactive Worksheet Form -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Section 1: Session Info -->
+                    <div class="bg-white rounded-2xl shadow-md p-6 border border-gray-200">
+                        <h3 class="font-extrabold text-emeraldDeep text-base mb-4 pb-2 border-b-2 border-goldPrimary flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-emeraldDeep text-white text-xs flex items-center justify-center">1</span>
+                            <span>القسم الأول: بيانات الجلسة والمجموعة</span>
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">رقم / اسم المجموعة التدريبية:</label>
+                                <input type="text" id="ws-group" value="المجموعة الأولى - فريق الرصد والإنذار" oninput="updateCapXmlPreview()" class="w-full rounded-xl border border-gray-300 px-3.5 py-2 focus:border-emeraldDeep focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">السيناريو قيد التطبيق:</label>
+                                <select id="ws-scenario" onchange="updateCapXmlPreview()" class="w-full rounded-xl border border-gray-300 px-3.5 py-2 focus:border-emeraldDeep focus:outline-none bg-white">
+                                    <option value="السيول والفيضانات المفاجئة (حوض بردى والقلمون)">السيول والفيضانات المفاجئة (حوض بردى والقلمون)</option>
+                                    <option value="حرائق الغابات والأحراج (اللاذقية والغاب)">حرائق الغابات والأحراج (اللاذقية والغاب)</option>
+                                    <option value="العواصف الرملية والترابية (دير الزور والبادية)">العواصف الرملية والترابية (دير الزور والبادية)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">المرحلة الزمنية (Inject):</label>
+                                <select id="ws-inject" onchange="updateCapXmlPreview()" class="w-full rounded-xl border border-gray-300 px-3.5 py-2 focus:border-emeraldDeep focus:outline-none bg-white">
+                                    <option value="المرحلة 1 (قبل الحدث)">المرحلة 1 (قبل الحدث)</option>
+                                    <option value="المرحلة 2 (تطور الخطر)" selected>المرحلة 2 (تطور الخطر)</option>
+                                    <option value="المرحلة 3 (ذروة الحدث)">المرحلة 3 (ذروة الحدث)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">التوقيت الافتراضي للحدث:</label>
+                                <input type="text" id="ws-time" value="14:00 ظهراً - تشرين الأول" oninput="updateCapXmlPreview()" class="w-full rounded-xl border border-gray-300 px-3.5 py-2 focus:border-emeraldDeep focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Monitoring & Threshold Decision -->
+                    <div class="bg-white rounded-2xl shadow-md p-6 border border-gray-200">
+                        <h3 class="font-extrabold text-emeraldDeep text-base mb-4 pb-2 border-b-2 border-goldPrimary flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-emeraldDeep text-white text-xs flex items-center justify-center">2</span>
+                            <span>القسم الثاني: تحليل الرصد وتحديد مستوى الإنذار (المصفوفة)</span>
+                        </h3>
+                        <div class="space-y-4 text-sm">
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">المؤشرات الفنية المرصودة في هذه المرحلة:</label>
+                                <textarea id="ws-indicators" rows="2" oninput="updateCapXmlPreview()" class="w-full rounded-xl border border-gray-300 px-3.5 py-2 focus:border-emeraldDeep focus:outline-none">تسجيل هطول مطري 42 مم خلال 4 ساعات في الحوض الأعلى مع تشبع التربة المسبق.</textarea>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block font-bold text-gray-700 mb-1">قرار مستوى الإنذار اللوني:</label>
+                                    <select id="ws-color" onchange="syncCapFromColor()" class="w-full rounded-xl border border-gray-300 px-3.5 py-2 font-bold focus:border-emeraldDeep focus:outline-none bg-orange-50 text-orange-900">
+                                        <option value="الأزرق (Blue) - مراقبة وتنبيه أولي">الأزرق (Blue) - مراقبة وتنبيه أولي</option>
+                                        <option value="الأصفر (Yellow) - تحذير مبكر">الأصفر (Yellow) - تحذير مبكر</option>
+                                        <option value="البرتقالي (Orange) - تأهب قصوى" selected>البرتقالي (Orange) - تأهب قصوى</option>
+                                        <option value="الأحمر (Red) - طوارئ قصوى">الأحمر (Red) - طوارئ قصوى</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-gray-700 mb-1">مبرر اختيار المستوى (وفق المصفوفة):</label>
+                                    <input type="text" id="ws-justification" value="تجاوز عتبة 35 مم/6 ساعات وبدء جريان السيول المنقولة نحو المناطق المنخفضة." class="w-full rounded-xl border border-gray-300 px-3.5 py-2 focus:border-emeraldDeep focus:outline-none">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: CAP Fields for ClimWeb -->
+                    <div class="bg-white rounded-2xl shadow-md p-6 border border-gray-200">
+                        <h3 class="font-extrabold text-emeraldDeep text-base mb-4 pb-2 border-b-2 border-goldPrimary flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-emeraldDeep text-white text-xs flex items-center justify-center">3</span>
+                            <span>القسم الثالث: إعداد رسالة بروتوكول التنبيه المشترك (CAP) لمنصة ClimWeb</span>
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm mb-4">
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">الاستعجال &lt;urgency&gt;:</label>
+                                <select id="ws-urgency" onchange="updateCapXmlPreview()" class="w-full rounded-xl border border-gray-300 px-3 py-2 bg-white">
+                                    <option value="Immediate">Immediate (فوري)</option>
+                                    <option value="Expected" selected>Expected (متوقع)</option>
+                                    <option value="Future">Future (مستقبلي)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">الشدة &lt;severity&gt;:</label>
+                                <select id="ws-severity" onchange="updateCapXmlPreview()" class="w-full rounded-xl border border-gray-300 px-3 py-2 bg-white">
+                                    <option value="Extreme">Extreme (قصوى)</option>
+                                    <option value="Severe" selected>Severe (شديدة)</option>
+                                    <option value="Moderate">Moderate (متوسطة)</option>
+                                    <option value="Minor">Minor (طفيفة)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">الموثوقية &lt;certainty&gt;:</label>
+                                <select id="ws-certainty" onchange="updateCapXmlPreview()" class="w-full rounded-xl border border-gray-300 px-3 py-2 bg-white">
+                                    <option value="Observed" selected>Observed (مرصود فعلياً)</option>
+                                    <option value="Likely">Likely (مرجح جداً)</option>
+                                    <option value="Possible">Possible (محتمل)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="space-y-3 text-sm">
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">النطاق الجغرافي &lt;areaDesc&gt;:</label>
+                                <input type="text" id="ws-area" value="حوض نهر بردى، وادي بردى، الهامة، دمر، والأنفاق المرورية في مدينة دمشق" oninput="updateCapXmlPreview()" class="w-full rounded-xl border border-gray-300 px-3.5 py-2">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">عنوان التحذير &lt;headline&gt;:</label>
+                                <input type="text" id="ws-headline" value="تحذير برتقالي: سيول مفاجئة متوقعة في حوض بردى والمناطق المنخفضة بدمشق" oninput="updateCapXmlPreview()" class="w-full rounded-xl border border-gray-300 px-3.5 py-2">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">وصف الأثر المتوقع &lt;description&gt;:</label>
+                                <textarea id="ws-desc" rows="2" oninput="updateCapXmlPreview()" class="w-full rounded-xl border border-gray-300 px-3.5 py-2">ارتفاع منسوب الجريان السطحي واحتمال غمر الطرق المنخفضة والأنفاق المرورية والطوابق الأرضية القريبة من مجرى النهر.</textarea>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">التعليمات والإجراءات &lt;instruction&gt;:</label>
+                                <textarea id="ws-instruction" rows="2" oninput="updateCapXmlPreview()" class="w-full rounded-xl border border-gray-300 px-3.5 py-2">الابتعاد الفوري عن بطون الأودية ومجاري السيول، عدم المجازفة بعبور الأنفاق المغمورة، وإخلاء الطوابق الأرضية المنخفضة.</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 4 & 5: SOPs & SMS -->
+                    <div class="bg-white rounded-2xl shadow-md p-6 border border-gray-200">
+                        <h3 class="font-extrabold text-emeraldDeep text-base mb-4 pb-2 border-b-2 border-goldPrimary flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-emeraldDeep text-white text-xs flex items-center justify-center">4</span>
+                            <span>القسم الرابع والخامس: الإجراءات الاستباقية، رسالة SMS، وقرار التصعيد</span>
+                        </h3>
+                        <div class="space-y-4 text-sm">
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">الإجراء المؤسسي والميداني الاستباقي (SOPs):</label>
+                                <textarea id="ws-sops" rows="2" class="w-full rounded-xl border border-gray-300 px-3.5 py-2">تفعيل غرفة عمليات المحافظة؛ إغلاق احترازي للأنفاق المنخفضة؛ تحريك فرق الدفاع المدني والمتطوعين لإخلاء المواقع الهشة.</textarea>
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="font-bold text-gray-700">رسالة قصيرة للجمهور (SMS - حد 160 حرفاً):</label>
+                                    <span id="sms-counter" class="text-xs font-bold text-emeraldDeep bg-emeraldLight px-2 py-0.5 rounded">118 / 160 حرف</span>
+                                </div>
+                                <input type="text" id="ws-sms" maxlength="160" oninput="updateSmsCount()" value="طوارئ MoEDM-تحذير برتقالي: خطر سيول في وادي بردى وأنفاق دمشق خلال ساعتين. ابتعدوا عن مجاري المياه وأخلوا الطوابق المنخفضة." class="w-full rounded-xl border border-gray-300 px-3.5 py-2">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">الجهة المخولة بالمصادقة وقنوات البث:</label>
+                                <input type="text" id="ws-escalation" value="مصادقة مدير الطوارئ في الوزارة (MoEDM) | البث عبر ClimWeb، رسائل SMS، وغرف عمليات المحافظات" class="w-full rounded-xl border border-gray-300 px-3.5 py-2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Live CAP XML Preview & Trainer Evaluation Score -->
+                <div class="space-y-6">
+                    <!-- Live CAP XML Generator -->
+                    <div class="bg-emeraldDeep text-white rounded-2xl shadow-lg p-5 border-2 border-goldPrimary">
+                        <div class="flex items-center justify-between mb-3 pb-2 border-b border-white/15">
+                            <h4 class="font-bold text-sm text-goldLight flex items-center gap-2">
+                                <i class="fa-solid fa-code"></i>
+                                <span>معاينة حية لملف CAP XML (ClimWeb)</span>
+                            </h4>
+                            <span class="text-[11px] bg-white/10 px-2 py-0.5 rounded font-mono">CAP v1.2</span>
+                        </div>
+                        <pre id="cap-xml-preview" dir="ltr" class="text-[11px] font-mono bg-black/30 p-3.5 rounded-xl overflow-x-auto text-emeraldLight leading-relaxed"></pre>
+                    </div>
+
+                    <!-- Trainer Evaluation Calculator -->
+                    <div class="bg-white rounded-2xl shadow-md p-5 border border-gray-200">
+                        <h4 class="font-extrabold text-emeraldDeep text-base mb-3 pb-2 border-b-2 border-goldPrimary flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-check text-goldPrimary"></i>
+                            <span>بطاقة تقييم المدرب السريع (من 20)</span>
+                        </h4>
+                        <div class="space-y-3 text-xs sm:text-sm">
+                            <div class="flex justify-between items-center">
+                                <span>1. مطابقة اللون مع العتبة الرقمية:</span>
+                                <input type="number" id="score-1" min="0" max="5" value="5" oninput="calcTotalScore()" class="w-16 text-center font-bold border border-gray-300 rounded-lg py-1">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span>2. سلامة واتساق حقول CAP:</span>
+                                <input type="number" id="score-2" min="0" max="5" value="5" oninput="calcTotalScore()" class="w-16 text-center font-bold border border-gray-300 rounded-lg py-1">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span>3. وضوح صياغة الأثر والإجراء بالعربية:</span>
+                                <input type="number" id="score-3" min="0" max="5" value="5" oninput="calcTotalScore()" class="w-16 text-center font-bold border border-gray-300 rounded-lg py-1">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span>4. كفاءة العمل الاستباقي والمجتمعي:</span>
+                                <input type="number" id="score-4" min="0" max="5" value="5" oninput="calcTotalScore()" class="w-16 text-center font-bold border border-gray-300 rounded-lg py-1">
+                            </div>
+                            <div class="pt-3 border-t border-gray-200 flex justify-between items-center font-extrabold text-base text-emeraldDeep">
+                                <span>المجموع الكلي للمرحلة:</span>
+                                <span id="total-score-badge" class="bg-goldPrimary text-white px-3 py-1 rounded-xl">20 / 20</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             TAB 5: WORD DOWNLOAD CENTER (4 SEPARATE FILES)
+             ========================================== -->
+        <section id="tab-downloads" class="tab-pane hidden fade-in space-y-8">
+            <div class="bg-gradient-to-l from-emeraldDeep via-emeraldMid to-emeraldDeep text-white rounded-2xl p-8 shadow-lg border-b-4 border-goldPrimary">
+                <span class="bg-goldPrimary text-emeraldDeep text-xs font-extrabold px-3 py-1 rounded-full uppercase">مركز التحميل المباشر</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold mt-2">تحميل جميع الوثائق والاستمارات كملفات وورد (Word) مستقلة</h2>
+                <p class="text-emeraldLight/90 text-sm mt-2 max-w-3xl">
+                    كل وثيقة واستمارة من الاستمارات السابقة مجهزة في ملف وورد (Microsoft Word) مستقل خاص بها، منسق بالكامل باللغة العربية (RTL) مع الجداول الرسمية بالسمة اللونية الخضراء والذهبية، وجاهز للطباعة أو التعديل الفوري.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- File 1 Card -->
+                <div class="bg-white rounded-2xl p-6 shadow-md border-2 border-gray-100 hover:border-goldPrimary transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emeraldLight text-emeraldDeep">الوثيقة المستقلة رقم 1</span>
+                            <i class="fa-solid fa-file-word text-3xl text-emeraldDeep"></i>
+                        </div>
+                        <h3 class="text-lg font-extrabold text-emeraldDeep mb-2">ملف ملخص المهمة وخطة العمل والروابط</h3>
+                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+                            يحتوي على الملخص التنفيذي لمهمة UNOPS & MoEDM، جدول الأنظمة التقنية المعتمدة والروابط المباشرة (ClimWeb & CAP)، وقوائم المهام التفصيلية للقائد التقني ومدرب ToT.
+                        </p>
+                        <div class="text-xs text-gray-500 font-mono bg-creamBg p-2.5 rounded-lg mb-5">
+                            MHEWS_Assignment_Summary_and_Action_Plan.doc
+                        </div>
+                    </div>
+                    <button onclick="downloadWordDoc('summary')" class="w-full bg-emeraldDeep hover:bg-emeraldMid text-white font-bold py-3 px-4 rounded-xl shadow transition flex items-center justify-center gap-2 border-b-4 border-goldPrimary">
+                        <i class="fa-solid fa-download text-goldLight"></i>
+                        <span>تحميل ملف ملخص المهمة وخطة العمل (Word)</span>
+                    </button>
+                </div>
+
+                <!-- File 2 Card -->
+                <div class="bg-white rounded-2xl p-6 shadow-md border-2 border-gray-100 hover:border-goldPrimary transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-goldPale text-emeraldDeep border border-goldPrimary/30">الوثيقة المستقلة رقم 2</span>
+                            <i class="fa-solid fa-file-word text-3xl text-goldPrimary"></i>
+                        </div>
+                        <h3 class="text-lg font-extrabold text-emeraldDeep mb-2">ملف مصفوفة (العتبة – الأثر – الإجراء) للمخاطر الستة</h3>
+                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+                            يضم جدول مواءمة بروتوكول CAP مع الألوان الأربعة، والجداول الكاملة للمخاطر الستة (السيول، الجفاف، حرائق الغابات، العواصف الترابية، موجات الحر، والعواصف الرياحية).
+                        </p>
+                        <div class="text-xs text-gray-500 font-mono bg-creamBg p-2.5 rounded-lg mb-5">
+                            MHEWS_Threshold_Impact_Action_Matrix.doc
+                        </div>
+                    </div>
+                    <button onclick="downloadWordDoc('matrix')" class="w-full bg-emeraldDeep hover:bg-emeraldMid text-white font-bold py-3 px-4 rounded-xl shadow transition flex items-center justify-center gap-2 border-b-4 border-goldPrimary">
+                        <i class="fa-solid fa-download text-goldLight"></i>
+                        <span>تحميل ملف مصفوفة الإنذار الكاملة (Word)</span>
+                    </button>
+                </div>
+
+                <!-- File 3 Card -->
+                <div class="bg-white rounded-2xl p-6 shadow-md border-2 border-gray-100 hover:border-goldPrimary transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emeraldLight text-emeraldDeep">الوثيقة المستقلة رقم 3</span>
+                            <i class="fa-solid fa-file-word text-3xl text-emeraldDeep"></i>
+                        </div>
+                        <h3 class="text-lg font-extrabold text-emeraldDeep mb-2">ملف دليل سيناريوهات المحاكاة التدريبية (TTX)</h3>
+                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+                            يحتوي على منهجية إدارة التمرين في دمشق، والجداول التفصيلية للسيناريوهات الثلاثة (السيول، الحرائق، العواصف الغبارية) عبر المراحل الزمنية الثلاث، ومعايير تقييم المتدربين.
+                        </p>
+                        <div class="text-xs text-gray-500 font-mono bg-creamBg p-2.5 rounded-lg mb-5">
+                            MHEWS_Tabletop_Simulation_Scenarios.doc
+                        </div>
+                    </div>
+                    <button onclick="downloadWordDoc('scenarios')" class="w-full bg-emeraldDeep hover:bg-emeraldMid text-white font-bold py-3 px-4 rounded-xl shadow transition flex items-center justify-center gap-2 border-b-4 border-goldPrimary">
+                        <i class="fa-solid fa-download text-goldLight"></i>
+                        <span>تحميل ملف سيناريوهات المحاكاة التدريبية (Word)</span>
+                    </button>
+                </div>
+
+                <!-- File 4 Card -->
+                <div class="bg-white rounded-2xl p-6 shadow-md border-2 border-gray-100 hover:border-goldPrimary transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-goldPale text-emeraldDeep border border-goldPrimary/30">الوثيقة المستقلة رقم 4</span>
+                            <i class="fa-solid fa-file-word text-3xl text-goldPrimary"></i>
+                        </div>
+                        <h3 class="text-lg font-extrabold text-emeraldDeep mb-2">ملف استمارة عمل المتدربين (Trainee Worksheet)</h3>
+                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+                            استمارة تطبيقية جاهزة للطباعة والتوزيع على المجموعات الأربع خلال التدريب لتعبئة قرارات الإنذار وحقول CAP ومصفوفة SOPs وبطاقة تقييم المدرب من 20 درجة.
+                        </p>
+                        <div class="text-xs text-gray-500 font-mono bg-creamBg p-2.5 rounded-lg mb-5">
+                            MHEWS_Trainee_Exercise_Worksheet.doc
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <button onclick="downloadWordDoc('worksheet_blank')" class="bg-emeraldDeep hover:bg-emeraldMid text-white font-bold py-3 px-3 rounded-xl shadow transition flex items-center justify-center gap-2 border-b-4 border-goldPrimary text-xs">
+                            <i class="fa-solid fa-download text-goldLight"></i>
+                            <span>تحميل الاستمارة الفارغة</span>
+                        </button>
+                        <button onclick="downloadWordDoc('worksheet_filled')" class="bg-goldPrimary hover:bg-goldLight text-emeraldDeep font-extrabold py-3 px-3 rounded-xl shadow transition flex items-center justify-center gap-2 text-xs">
+                            <i class="fa-solid fa-file-signature"></i>
+                            <span>تحميل الاستمارة المعبأة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-emeraldDeep text-white border-t-4 border-goldPrimary mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-emeraldLight/80">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved text-goldLight"></i>
+                <span>مشروع دعم النظام الوطني للإنذار المبكر متعدد المخاطر (MHEWS) – وزارة الطوارئ وإدارة الكوارث في سوريا (MoEDM) بالتعاون مع UNOPS</span>
+            </div>
+            <div>
+                <span>متوافق مع WMO ClimWeb & OASIS CAP v1.2</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==========================================
+         JAVASCRIPT LOGIC & WORD FILE GENERATOR
+         ========================================== -->
+    <script>
+        // 1. Data Store for the 6 Hazards Matrix
+        const hazardsMatrixData = [
+            {
+                id: 'floods',
+                title: 'أولاً: السيول والفيضانات المفاجئة (Flash Floods)',
+                indicators: 'الهطول المطري الساعي/اليومي (مم)، رطوبة التربة المسبقة، ومؤشر الجريان السطحي في الأودية والمدن.',
+                rows: [
+                    { level: 'الأزرق', bg: 'bg-blue-50/70', badge: 'bg-blue-600', threshold: 'هطول 10-20 مم خلال 6 ساعات أو 20-30 مم خلال 24 ساعة.', impact: 'تجمع مياه في المنخفضات الطرقية؛ بطء حركة المرور؛ لا أضرار هيكلية.', action: 'متابعة التحديثات الرادارية/العددية كل 6 ساعات؛ إخطار البلديات لتفقّد مصارف الأمطار.' },
+                    { level: 'الأصفر', bg: 'bg-yellow-50/80', badge: 'bg-yellow-500', threshold: 'هطول 20-35 مم خلال 6 ساعات أو تشبع التربة مع توقع أمطار غزيرة.', impact: 'فيضان محدود في الأنفاق ومجاري الأودية الموسمية؛ خطر على المخيمات العشوائية قرب المجاري.', action: 'إصدار تنبيه أصفر عبر ClimWeb؛ تحذير القاطنين قرب بطون الأودية؛ وضع فرق الدفاع المدني في حالة استعداد.' },
+                    { level: 'البرتقالي', bg: 'bg-orange-50/80', badge: 'bg-orange-500', threshold: 'هطول 35-50 مم خلال 6 ساعات أو جريان سيول منقول من أحواض عليا.', impact: 'غمر أحياء منخفضة وانقطاع طرق رئيسية؛ تضرر البنية التحتية الهشة؛ خطر انجراف المركبات.', action: 'تفعيل غرفة عمليات الطوارئ بالمحافظة؛ إغلاق الطرق والأنفاق الخطرة؛ إخلاء استباقي للمواقع الهشة والمخيمات في مسار السيل.' },
+                    { level: 'الأحمر', bg: 'bg-red-50/80', badge: 'bg-red-600', threshold: 'هطول يتجاوز 50 مم خلال 6 ساعات أو انهيار سدود التجميع الصغيرة.', impact: 'سيول جارفة واسعة النطاق؛ تهديد مباشر للأرواح؛ انقطاع خدمات الكهرباء والاتصالات؛ عزل تجمعات سكنية.', action: 'إطلاق إنذار أحمر فوري عبر CAP وكافة وسائل الإعلام؛ تنفيذ عمليات البحث والإنقاذ؛ فتح مراكز الإيواء الطارئة.' }
+                ]
+            },
+            {
+                id: 'drought',
+                title: 'ثانياً: الجفاف (Drought)',
+                indicators: 'مؤشر الهطول المعياري (SPI)، شذوذ الغطاء النباتي (NDVI Anomaly)، ومخزون السدود والمياه الجوفية.',
+                rows: [
+                    { level: 'الأزرق', bg: 'bg-blue-50/70', badge: 'bg-blue-600', threshold: 'مؤشر SPI بين -0.5 و -0.9 لمدة شهرين متتاليين؛ تأخر موسم الأمطار.', impact: 'نقص طفيف في رطوبة التربة السطحية؛ إجهاد مبكر للمحاصيل البعلية والمراعي.', action: 'إصدار نشرة رصد مناخي زراعي؛ التنسيق مع وزارة الزراعة لمتابعة تطور الموسم المطري.' },
+                    { level: 'الأصفر', bg: 'bg-yellow-50/80', badge: 'bg-yellow-500', threshold: 'مؤشر SPI بين -1.0 و -1.4 لمدة 3 أشهر؛ انخفاض NDVI عن المعدل بـ 15%.', impact: 'تراجع واضح في نمو المحاصيل الشتوية (القمح والشعير)؛ انخفاض مناسيب الينابيع الموسمية.', action: 'تفعيل خطط ترشيد مياه الري؛ توجيه المزارعين نحو جدولة الري التكميلي؛ تقييم احتياجات الأعلاف.' },
+                    { level: 'البرتقالي', bg: 'bg-orange-50/80', badge: 'bg-orange-500', threshold: 'مؤشر SPI بين -1.5 و -1.9؛ انخفاض مخزون السدود لأقل من 40% من سعتها التشغيلية.', impact: 'فشل واسع للمحاصيل البعلية؛ شح في مياه الشرب بالقرى المعتمدة على الآبار السطحية؛ نفوق جزئي للثروة الحيوانية.', action: 'فرض تقنين صارم على استجرار المياه؛ دعم المربين بالأعلاف؛ تفعيل صهاريج مياه الشرب للمناطق المتضررة.' },
+                    { level: 'الأحمر', bg: 'bg-red-50/80', badge: 'bg-red-600', threshold: 'مؤشر SPI أقل من -2.0 (جفاف استثنائي) لموسم كامل؛ جفاف مصادر المياه الرئيسية.', impact: 'أزمة أمن غذائي ومائي حادة؛ موجات نزوح من الأرياف المتضررة؛ تدهور شديد في الأراضي الزراعية.', action: 'إعلان حالة طوارئ جفاف؛ إطلاق برامج الاستجابة الإنسانية العاجلة، وتخصيص الموارد المائية حصراً لمياه الشرب.' }
+                ]
+            },
+            {
+                id: 'wildfires',
+                title: 'ثالثاً: حرائق الغابات والأحراج (Wildfires)',
+                indicators: 'مؤشر طقس الحرائق (FWI)، درجة الحرارة، الرطوبة النسبية، وسرعة الرياح (خاصة الرياح الشرقية الجافة "الشلوق").',
+                rows: [
+                    { level: 'الأزرق', bg: 'bg-blue-50/70', badge: 'bg-blue-600', threshold: 'حرارة 30-34°م، رطوبة نسبية 30-40%، رياح 20-30 كم/ساعة (FWI متوسط).', impact: 'قابلية اشتعال الأعشاب الجافة السطحية؛ إمكانية السيطرة السريعة على أي بؤرة.', action: 'تكثيف دوريات المراقبة الحراجية؛ تذكير السكان بمنع إشعال النيران قرب الغابات.' },
+                    { level: 'الأصفر', bg: 'bg-yellow-50/80', badge: 'bg-yellow-500', threshold: 'حرارة 35-38°م، رطوبة 20-30%، رياح 30-40 كم/ساعة (FWI مرتفع).', impact: 'سرعة انتشار متوسطة إلى عالية في حال نشوب حريق؛ صعوبة نسبية في الإخماد الأرضي بالمناطق الوعرة.', action: 'منع دخول المتنزهين لمناطق الغابات الكثيفة؛ تمركز آليات الإطفاء في نقاط متقدمة؛ تعليق أعمال التفحيم والحرق الزراعي.' },
+                    { level: 'البرتقالي', bg: 'bg-orange-50/80', badge: 'bg-orange-500', threshold: 'حرارة 39-41°م، رطوبة أقل من 20%، رياح 40-50 كم/ساعة (FWI شديد الارتفاع).', impact: 'انتشار سريع جداً للحرائق (حرائق تاجية)؛ تطاير الشرر لمسافات بعيدة؛ تهديد القرى المتاخمة للغابات.', action: 'استنفار كامل لفرق الإطفاء والدفاع المدني؛ قطع التيار الكهربائي عن الخطوط العابرة للغابات؛ تجهيز خطط إخلاء القرى المجاورة.' },
+                    { level: 'الأحمر', bg: 'bg-red-50/80', badge: 'bg-red-600', threshold: 'حرارة تتجاوز 41°م، رطوبة أقل من 15%، رياح تتجاوز 50 كم/ساعة أو رصد حرائق كبرى خارجة عن السيطرة.', impact: 'عواصف نارية يصعب مواجهتها مباشرة؛ خطر داهم على القرى السكنية والمنشآت الحيوية؛ تلوث دخاني كثيف.', action: 'الإخلاء الفوري للتجمعات السكنية المهددة؛ طلب الإسناد الوطني الشامل والجوي؛ فتح ممرات الطوارئ وإغلاق الطرق المؤدية لمنطقة الحريق.' }
+                ]
+            },
+            {
+                id: 'dust',
+                title: 'رابعاً: العواصف الرملية والترابية (Sand and Dust Storms)',
+                indicators: 'مدى الرؤية الأفقية (بالمتر)، تركيز الجسيمات العالقة (PM10)، وسرعة الرياح المثيرة للغبار.',
+                rows: [
+                    { level: 'الأزرق', bg: 'bg-blue-50/70', badge: 'bg-blue-600', threshold: 'مدى الرؤية 3000 - 5000 متر؛ عوالق ترابية خفيفة.', impact: 'تدنٍ طفيف في جودة الهواء؛ انزعاج لمرضى الربو والحساسية.', action: 'نشر إرشادات صحية أولية للفئات الحساسة (الأطفال، كبار السن، مرضى الجهاز التنفسي).' },
+                    { level: 'الأصفر', bg: 'bg-yellow-50/80', badge: 'bg-yellow-500', threshold: 'مدى الرؤية 1000 - 3000 متر؛ رياح نشطة مثيرة للغبار.', impact: 'صعوبة في القيادة على الطرق السريعة والصحراوية؛ زيادة مراجعات أقسام الإسعاف التنفسي.', action: 'إصدار تحذير مروري؛ رفع جاهزية أقسام الطوارئ في المشافي وتأمين جلسات الإرذاذ والأكسجين.' },
+                    { level: 'البرتقالي', bg: 'bg-orange-50/80', badge: 'bg-orange-500', threshold: 'مدى الرؤية 300 - 1000 متر؛ عاصفة ترابية كثيفة مستمرة لأكثر من 3 ساعات.', impact: 'شبه انعدام للرؤية على الطرق المفتوحة؛ تعطل حركة الطيران؛ حالات اختناق حادة؛ تضرر ألواح الطاقة الشمسية.', action: 'إغلاق الطرق الصحراوية مؤقتاً؛ تعليق الأنشطة الخارجية والمدارس في المناطق المتأثرة؛ التزام المنازل وإحكام إغلاق النوافذ.' },
+                    { level: 'الأحمر', bg: 'bg-red-50/80', badge: 'bg-red-600', threshold: 'مدى الرؤية أقل من 300 متر (جدار غباري كثيف / "هبوب")؛ تركيز PM10 يتجاوز 2000 ميكروغرام/م3.', impact: 'شلل تام في حركة النقل البري والجوي؛ حوادث تصادم متسلسلة؛ خطر شديد على الحياة لمرضى الجهاز التنفسي والقلب.', action: 'حظر حركة السير على الطرق الخارجية؛ استنفار كامل للمشافي وفرق الإسعاف؛ تعليق الدوام الرسمي في المناطق المنكوبة.' }
+                ]
+            },
+            {
+                id: 'heatwaves',
+                title: 'خامساً: موجات الحر (Heatwaves)',
+                indicators: 'درجة الحرارة العظمى والصغرى، الفارق عن المعدل المناخي (Anomaly)، ومدة استمرار الموجة (بأيام).',
+                rows: [
+                    { level: 'الأزرق', bg: 'bg-blue-50/70', badge: 'bg-blue-600', threshold: 'حرارة أعلى من المعدل بـ 3-4°م لمدة يومين (36-38°م في الداخل).', impact: 'شعور بالإجهاد الحراري خلال ساعات الذروة؛ زيادة الطلب على المياه والكهرباء.', action: 'التوعية بشرب السوائل وتجنب التعرض المباشر للشمس بين الساعة 11 صباحاً و4 عصراً.' },
+                    { level: 'الأصفر', bg: 'bg-yellow-50/80', badge: 'bg-yellow-500', threshold: 'حرارة أعلى من المعدل بـ 5-6°م لمدة 3 أيام (39-41°م) مع صغرى ليلية فوق 25°م.', impact: 'حالات ضربات شمس وإعياء حراري بين العمال الميدانيين وكبار السن؛ ارتفاع خطر حرائق المحاصيل.', action: 'توجيه أصحاب العمل لتقليص ساعات العمل الميداني وقت الذروة؛ توفير نقاط مياه باردة في الأماكن العامة.' },
+                    { level: 'البرتقالي', bg: 'bg-orange-50/80', badge: 'bg-orange-500', threshold: 'حرارة تتجاوز 42-44°م لمدة 3 أيام متتالية أو أكثر مع رطوبة عالية ساحلياً.', impact: 'ضغط شديد على شبكات الكهرباء والمياه؛ خطر صحي جسيم على الفئات الهشة؛ نفوق في مزارع الدواجن.', action: 'حظر العمل تحت أشعة الشمس المباشرة في ساعات الذروة؛ تفعيل خطط طوارئ وزارة الصحة؛ حماية المحولات الكهربائية.' },
+                    { level: 'الأحمر', bg: 'bg-red-50/80', badge: 'bg-red-600', threshold: 'حرارة قياسية تتجاوز 45°م لعدة أيام متواصلة مع صغرى لا تقل عن 30°م.', impact: 'ارتفاع معدلات الوفيات المرتبطة بالحرارة؛ أعطال واسعة في شبكات الطاقة والاتصالات؛ تلف شديد للمحاصيل.', action: 'تقليص ساعات الدوام الرسمي أو تعطيله؛ فتح مراكز تبريد مجتمعية؛ استنفار فرق الطوارئ الطبية والدفاع المدني.' }
+                ]
+            },
+            {
+                id: 'windstorms',
+                title: 'سادساً: العواصف الرياحية (Windstorms)',
+                indicators: 'سرعة الرياح المستمرة (Sustained Wind) وسرعة الهبات القوية (Wind Gusts) بالكيلومتر/ساعة.',
+                rows: [
+                    { level: 'الأزرق', bg: 'bg-blue-50/70', badge: 'bg-blue-600', threshold: 'رياح مستمرة 35-45 كم/ساعة؛ هبات تصل إلى 55 كم/ساعة.', impact: 'تطاير الأجسام الخفيفة غير المثبتة؛ اضطراب البحر في المناطق الساحلية.', action: 'تثبيت اللوحات الإعلانية والخيم؛ تنبيه الصيادين ومرتادي البحر.' },
+                    { level: 'الأصفر', bg: 'bg-yellow-50/80', badge: 'bg-yellow-500', threshold: 'رياح مستمرة 45-60 كم/ساعة؛ هبات تصل إلى 70 كم/ساعة.', impact: 'تكسر أغصان الأشجار؛ تضرر البيوت البلاستيكية الزراعية وخيم النازحين؛ انقطاعات كهربائية محدودة.', action: 'إغلاق الموانئ أمام قوارب الصيد الصغيرة؛ تدعيم الخيم والبيوت البلاستيكية؛ جاهزية ورشات إصلاح الكهرباء.' },
+                    { level: 'البرتقالي', bg: 'bg-orange-50/80', badge: 'bg-orange-500', threshold: 'رياح مستمرة 60-75 كم/ساعة؛ هبات 75-90 كم/ساعة.', impact: 'سقوط أشجار وأعمدة كهرباء؛ تطاير أسقف الصفيح والألواح الشمسية؛ صعوبة بالغة في حركة الشاحنات.', action: 'إغلاق المرافئ البحرية بالكامل؛ منع حركة المركبات العالية على الجسور والطرق المكشوفة؛ إخلاء الخيم الهشة.' },
+                    { level: 'الأحمر', bg: 'bg-red-50/80', badge: 'bg-red-600', threshold: 'رياح عاتية تتجاوز 75 كم/ساعة؛ هبات تتجاوز 95-100 كم/ساعة.', impact: 'أضرار هيكلية واسعة في الأبنية الضعيفة والمخيمات؛ انهيار أبراج اتصالات وكهرباء؛ شلل مروري وخطر مباشر على الحياة.', action: 'حظر التجول الخارجي أثناء ذروة العاصفة؛ قطع الكهرباء احترازياً عن الشبكات المتضررة؛ تدخل فرق الطوارئ والإنقاذ.' }
+                ]
+            }
+        ];
+
+        // 2. Data Store for the 3 TTX Scenarios
+        const scenariosData = [
+            {
+                title: 'السيناريو الأول: السيول والفيضانات المفاجئة (حوض بردى والقلمون - ريف دمشق ودمشق)',
+                context: 'أواخر شهر تشرين الأول/أكتوبر؛ منخفض جوي عميق مصحوب بحالة عدم استقرار جوي شديدة فوق سلسلة جبال القلمون الغربي وحوض نهر بردى، بعد أسبوع من أمطار متفرقة أدت لتشبع جزئي للتربة.',
+                elements: 'التجمعات السكنية في بطون الأودية (وادي بردى، دمر، الهامة)، الأنفاق المرورية في مدينة دمشق، والمخيمات أو المساكن الهشة قرب مجاري السيول الموسمية في ريف دمشق.',
+                output: 'رسم المضلع الجغرافي (Polygon) للمنطقة المهددة على خريطة ClimWeb في المرحلة الثانية، وكتابة نص <instruction> باللغة العربية البسيطة الموجهة لسكان وادي بردى وسائقي المركبات في أنفاق دمشق.',
+                stages: [
+                    { stage: 'المرحلة 1 (قبل 24 ساعة)', inject: 'نماذج التنبؤ العددي على ClimWeb تشير لهطول 25-35 مم خلال 6 ساعات فوق مرتفعات الزبداني والقلمون غداً ظهراً.', decision: 'المستوى الأصفر (Moderate / Expected / Likely)', sops: 'إخطار محافظة دمشق وريفها لتنظيف مصارف الأمطار والعبّارات؛ وضع فرق الدفاع المدني والبلديات في حالة جاهزية؛ نشر تنبيه أولي للسكان قرب الأودية.' },
+                    { stage: 'المرحلة 2 (قبل 3 ساعات)', inject: 'تحديثات الأقمار الصناعية ومحطات الرصد تسجل 42 مم خلال 4 ساعات في الحوض الأعلى مع تشكل خلايا رعدية شديدة تتجه نحو دمشق.', decision: 'المستوى البرتقالي (Severe / Expected / Observed)', sops: 'تفعيل غرفة عمليات الطوارئ بالمحافظة؛ إغلاق احترازي للأنفاق المنخفضة وطرق بطون الأودية؛ تحريك فرق المتطوعين لإخلاء استباقي للعائلات القاطنة في الطوابق الأرضية المنخفضة والخيم قرب المجرى.' },
+                    { stage: 'المرحلة 3 (ساعة الصفر)', inject: 'بلاغ ميداني عن تدفق سيل جارف بارتفاع يتجاوز 1.5 متر في مجرى الوادي وانقطاع الطريق الواصل بين الهامة ودمر، مع استمرار الهطول فوق 55 مم.', decision: 'المستوى الأحمر (Extreme / Immediate / Observed)', sops: 'إطلاق تحذير طوارئ فوري عبر CAP وكافة القنوات؛ توجيه السكان للصعود إلى الطوابق العليا فوراً؛ قطع التيار الكهربائي احترازياً عن الأحياء المغمورة؛ دفع فرق البحث والإنقاذ.' }
+                ]
+            },
+            {
+                title: 'السيناريو الثاني: حرائق الغابات والأحراج (اللاذقية والغاب - الساحل السوري)',
+                context: 'منتصف شهر أيلول/سبتمبر؛ هبوب رياح شرقية جافة وحارة ("الشلوق") قادمة من البادية باتجاه السفوح الغربية لجبال الساحل السوري (منطقة كسب، الحفة، وريف مصياف)، بعد صيف شديد الجفاف.',
+                elements: 'الغابات الصنوبرية الكثيفة، القرى الجبلية المتداخلة مع الأحراج، البساتين الزراعية، وخطوط التوتر العالي العابرة للغابات.',
+                output: 'تصميم مصفوفة تصعيد سريعة تحدد: متى ينتقل القرار من مديرية الزراعة بالمحافظة إلى غرفة العمليات المركزية في وزارة الطوارئ (MoEDM)؟ وكيف يتم إبلاغ كبار السن وذوي الإعاقة في القرى الجبلية بإجراءات الإخلاء؟',
+                stages: [
+                    { stage: 'المرحلة 1 (قبل 48 ساعة)', inject: 'مؤشر طقس الحرائق (FWI) يرتفع لمستوى "عالٍ جداً"؛ توقع حرارة 37°م، رطوبة نسبية 22%، ورياح شرقية بسرعة 35 كم/ساعة.', decision: 'المستوى الأصفر (Moderate / Expected / Likely)', sops: 'إصدار تعميم بمنع إشعال النيران والتحطيب والتفحيم؛ إغلاق المواقع الحراجية أمام المتنزهين؛ نشر دوريات مراقبة حراجية ومتطوعين في أبراج الرصد.' },
+                    { stage: 'المرحلة 2 (صباح اليوم الأول)', inject: 'الحرارة تسجل 40°م، الرطوبة تنخفض إلى 14%، وهبات الرياح تصل إلى 55 كم/ساعة؛ رصد بؤرة دخان أولية في وادٍ وعر قرب قرية بلوران.', decision: 'المستوى البرتقالي (Severe / Expected / Observed)', sops: 'استنفار شامل لفرق الإطفاء الحراجي والدفاع المدني؛ فصل خطوط الكهرباء العابرة للغابة؛ تعبئة صهاريج المياه البلدية والأهلية؛ تنبيه مخاتير القرى المجاورة لتجهيز السكان لاحتمال الإخلاء.' },
+                    { stage: 'المرحلة 3 (بعد 4 ساعات)', inject: 'تحول الحريق إلى "حريق تاجي" سريع الانتشار بفعل الرياح التي تجاوزت 65 كم/ساعة؛ تطاير الشرر لمسافة 500 متر واقتراب النيران من أطراف 3 قرى سكنية.', decision: 'المستوى الأحمر (Extreme / Immediate / Observed)', sops: 'إصدار أمر إخلاء فوري للقرى المهددة عبر مسارات آمنة بعكس اتجاه الرياح؛ طلب مؤازرة وطنية من المحافظات المجاورة؛ فتح المدارس في مراكز المدن كمراكز إيواء؛ نشر فرق إسعاف لمعالجة حالات الاختناق الدخاني.' }
+                ]
+            },
+            {
+                title: 'السيناريو الثالث: العواصف الرملية والترابية (دير الزور، البادية، وامتدادها نحو حلب ودمشق)',
+                context: 'شهر أيار/مايو؛ تشكل جبهة هوائية نشطة فوق البادية السورية والحدود العراقية تثير جداراً غبارياً كثيفاً ("هبوب") يتحرك بسرعة نحو وادي الفرات والمنطقة الوسطى والجنوبية.',
+                elements: 'مرضى الربو والجهاز التنفسي، مستخدمو الطرق السريعة الدولية (طريق دمشق-حلب وطريق دير الزور-تدمر)، المخيمات، ومنظومات الطاقة الشمسية.',
+                output: 'صياغة رسالتين مختلفتين لنفس التحذير البرتقالي: الأولى فنية مؤسسية موجهة لمديرية الصحة وإدارة المرور، والثانية مجتمعية مبسطة (لا تتجاوز 160 حرفاً لرسائل SMS) موجهة للسكان المحليين.',
+                stages: [
+                    { stage: 'المرحلة 1 (قبل 18 ساعة)', inject: 'صور الأقمار الصناعية ونماذج الغبار تتوقع نشاط رياح بسرعة 45 كم/ساعة وتدني الرؤية الأفقية إلى 1500-2500 متر في المنطقة الشرقية والبادية.', decision: 'المستوى الأصفر (Moderate / Expected / Likely)', sops: 'إصدار نشرة تحذيرية بالتنسيق مع وزارة الصحة ووزارة النقل؛ تذكير مرضى الربو بتأمين البخاخات؛ تنبيه السائقين على الطرق الصحراوية.' },
+                    { stage: 'المرحلة 2 (قبل 4 ساعات)', inject: 'محطات الرصد في البوكمال والميادين تسجل انخفاض الرؤية إلى 600 متر وارتفاع تركيز PM10 بشكل حاد، والجبهة الغبارية تتقدم غرباً نحو تدمر وحمص.', decision: 'المستوى البرتقالي (Severe / Expected / Observed)', sops: 'رفع جاهزية أقسام الإسعاف وتجهيز أسطوانات الأكسجين وجلسات الإرذاذ في المشافي؛ تعليق الأنشطة المدرسية الخارجية؛ تحذير المزارعين ومشغلي محطات الطاقة الشمسية.' },
+                    { stage: 'المرحلة 3 (أثناء الذروة)', inject: 'جدار غباري كثيف يضرب دير الزور وأجزاء من البادية؛ انعدام الرؤية لأقل من 150 متراً، رياح 70 كم/ساعة، وتوافد عشرات حالات الاختناق للمشافي.', decision: 'المستوى الأحمر (Extreme / Immediate / Observed)', sops: 'إغلاق الطرق الصحراوية والسريعة أمام حركة السير لمنع الحوادث المتسلسلة؛ تعليق الدوام في المناطق الأشد تضرراً؛ بث تعليمات البقاء داخل المنازل وإحكام إغلاق النوافذ بقطع قماش مبللة.' }
+                ]
+            }
+        ];
+
+        // 3. Tab Switching Function
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            const targetSection = document.getElementById(tabId);
+            if (targetSection) targetSection.classList.remove('hidden');
+
+            const targetBtn = document.getElementById('btn-' + tabId);
+            if (targetBtn) targetBtn.classList.add('active');
+        }
+
+        // 4. Render Hazards Matrix
+        function filterHazard(hazardId) {
+            document.querySelectorAll('.hazard-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById('haz-btn-' + hazardId);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            const container = document.getElementById('hazards-container');
+            const filtered = hazardId === 'all' ? hazardsMatrixData : hazardsMatrixData.filter(h => h.id === hazardId);
+
+            container.innerHTML = filtered.map(h => `
+                <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-200 fade-in">
+                    <div class="bg-emeraldDeep text-white px-6 py-4 border-b-2 border-goldPrimary flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <h3 class="font-extrabold text-base sm:text-lg text-goldLight">${h.title}</h3>
+                        <span class="text-xs bg-white/10 px-3 py-1 rounded-lg text-white">المؤشرات: ${h.indicators}</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-sm border-collapse">
+                            <thead>
+                                <tr class="bg-emeraldLight/60 text-emeraldDeep border-b border-gray-200">
+                                    <th class="py-3 px-4 font-bold w-28">المستوى</th>
+                                    <th class="py-3 px-4 font-bold w-1/4">العتبة الفنية (Threshold)</th>
+                                    <th class="py-3 px-4 font-bold w-1/3">الأثر المتوقع (Expected Impact)</th>
+                                    <th class="py-3 px-4 font-bold">الإجراء المؤسسي والمجتمعي (Action / SOP)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                ${h.rows.map(r => `
+                                    <tr class="${r.bg}">
+                                        <td class="py-3.5 px-4 font-extrabold"><span class="inline-block w-3 h-3 rounded-full ${r.badge} ml-2"></span>${r.level}</td>
+                                        <td class="py-3.5 px-4 font-semibold text-gray-800">${r.threshold}</td>
+                                        <td class="py-3.5 px-4 text-gray-700">${r.impact}</td>
+                                        <td class="py-3.5 px-4 text-gray-800">${r.action}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 5. Render Scenarios
+        function renderScenarios() {
+            const container = document.getElementById('scenarios-container');
+            container.innerHTML = scenariosData.map((s, idx) => `
+                <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-200">
+                    <div class="bg-emeraldDeep text-white px-6 py-4 border-b-2 border-goldPrimary">
+                        <span class="text-xs font-bold text-goldLight uppercase">تمرين محاكاة مكتبي #${idx + 1}</span>
+                        <h3 class="font-extrabold text-lg mt-0.5">${s.title}</h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+                            <div class="bg-creamBg p-3.5 rounded-xl border border-gray-200">
+                                <strong class="text-emeraldDeep block mb-1">السياق الجغرافي والموسمي:</strong>
+                                <span class="text-gray-700">${s.context}</span>
+                            </div>
+                            <div class="bg-creamBg p-3.5 rounded-xl border border-gray-200">
+                                <strong class="text-emeraldDeep block mb-1">العناصر المعرضة للخطر:</strong>
+                                <span class="text-gray-700">${s.elements}</span>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right text-sm border-collapse border border-gray-200">
+                                <thead>
+                                    <tr class="bg-emeraldLight/70 text-emeraldDeep">
+                                        <th class="py-3 px-4 font-bold border-b border-gray-200 w-36">المرحلة الزمنية</th>
+                                        <th class="py-3 px-4 font-bold border-b border-gray-200 w-1/3">معطيات الرصد (Injects)</th>
+                                        <th class="py-3 px-4 font-bold border-b border-gray-200 w-48">القرار الفني (CAP)</th>
+                                        <th class="py-3 px-4 font-bold border-b border-gray-200">الإجراءات التشغيلية والمجتمعية (SOPs)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    ${s.stages.map((st, sIdx) => {
+                                        const bgClass = sIdx === 0 ? 'bg-yellow-50/70' : (sIdx === 1 ? 'bg-orange-50/70' : 'bg-red-50/70');
+                                        return `
+                                            <tr class="${bgClass}">
+                                                <td class="py-3.5 px-4 font-extrabold text-emeraldDeep">${st.stage}</td>
+                                                <td class="py-3.5 px-4 text-gray-800">${st.inject}</td>
+                                                <td class="py-3.5 px-4 font-bold text-gray-900">${st.decision}</td>
+                                                <td class="py-3.5 px-4 text-gray-800">${st.sops}</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="bg-goldPale p-4 rounded-xl border-r-4 border-goldPrimary text-xs sm:text-sm">
+                            <strong class="text-emeraldDeep"><i class="fa-solid fa-laptop-code ml-1 text-goldPrimary"></i> المخرج التطبيقي المطلوب من المتدربين:</strong>
+                            <span class="text-gray-800 mr-1">${s.output}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 6. Worksheet Interactive Functions
+        function syncCapFromColor() {
+            const colorVal = document.getElementById('ws-color').value;
+            const urg = document.getElementById('ws-urgency');
+            const sev = document.getElementById('ws-severity');
+            const cert = document.getElementById('ws-certainty');
+
+            if (colorVal.includes('الأزرق')) {
+                urg.value = 'Future'; sev.value = 'Minor'; cert.value = 'Possible';
+            } else if (colorVal.includes('الأصفر')) {
+                urg.value = 'Expected'; sev.value = 'Moderate'; cert.value = 'Likely';
+            } else if (colorVal.includes('البرتقالي')) {
+                urg.value = 'Expected'; sev.value = 'Severe'; cert.value = 'Observed';
+            } else if (colorVal.includes('الأحمر')) {
+                urg.value = 'Immediate'; sev.value = 'Extreme'; cert.value = 'Observed';
+            }
+            updateCapXmlPreview();
+        }
+
+        function updateCapXmlPreview() {
+            const scenario = document.getElementById('ws-scenario').value;
+            const urgency = document.getElementById('ws-urgency').value;
+            const severity = document.getElementById('ws-severity').value;
+            const certainty = document.getElementById('ws-certainty').value;
+            const area = document.getElementById('ws-area').value;
+            const headline = document.getElementById('ws-headline').value;
+            const desc = document.getElementById('ws-desc').value;
+            const instruction = document.getElementById('ws-instruction').value;
+
+            const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+  <identifier>SY-MOEDM-2026-MHEWS-01</identifier>
+  <sender>mhews@moedm.gov.sy</sender>
+  <status>Exercise</status>
+  <msgType>Alert</msgType>
+  <scope>Public</scope>
+  <info>
+    <language>ar-SY</language>
+    <category>Met</category>
+    <event>${scenario}</event>
+    <urgency>${urgency}</urgency>
+    <severity>${severity}</severity>
+    <certainty>${certainty}</certainty>
+    <headline>${headline}</headline>
+    <description>${desc}</description>
+    <instruction>${instruction}</instruction>
+    <area>
+      <areaDesc>${area}</areaDesc>
+    </area>
+  </info>
+</alert>`;
+            document.getElementById('cap-xml-preview').textContent = xml;
+        }
+
+        function updateSmsCount() {
+            const val = document.getElementById('ws-sms').value;
+            document.getElementById('sms-counter').textContent = `${val.length} / 160 حرف`;
+        }
+
+        function calcTotalScore() {
+            const s1 = Number(document.getElementById('score-1').value) || 0;
+            const s2 = Number(document.getElementById('score-2').value) || 0;
+            const s3 = Number(document.getElementById('score-3').value) || 0;
+            const s4 = Number(document.getElementById('score-4').value) || 0;
+            const total = Math.min(20, Math.max(0, s1 + s2 + s3 + s4));
+            document.getElementById('total-score-badge').textContent = `${total} / 20`;
+        }
+
+        // 7. Standalone Word (.doc) File Generator for each of the 4 Documents
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').textContent = title;
+            document.getElementById('toast-msg').textContent = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3500);
+        }
+
+        function wrapWordHtml(title, subtitle, bodyContent) {
+            return `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40' dir='rtl' lang='ar'>
+            <head>
+                <meta charset="utf-8">
+                <title>${title}</title>
+                <style>
+                    @page { size: A4; margin: 1.8cm; }
+                    body { font-family: 'Arial', 'Tahoma', sans-serif; direction: rtl; text-align: right; color: #1F2937; line-height: 1.5; }
+                    .banner { background-color: #0B4F32; color: #FFFFFF; padding: 14px; text-align: center; border-bottom: 4px solid #C59B27; margin-bottom: 18px; }
+                    .banner h1 { font-size: 18pt; margin: 0 0 6px 0; color: #FFFFFF; }
+                    .banner p { font-size: 11pt; margin: 0; color: #FBF7E8; font-weight: bold; }
+                    h2 { color: #0B4F32; font-size: 14pt; border-right: 5px solid #C59B27; padding-right: 8px; margin-top: 18px; margin-bottom: 8px; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 14px; direction: rtl; }
+                    th { background-color: #0B4F32; color: #FFFFFF; font-weight: bold; padding: 8px; border: 1px solid #C59B27; font-size: 10.5pt; text-align: right; }
+                    td { padding: 8px; border: 1px solid #D1D5DB; font-size: 10pt; vertical-align: middle; text-align: right; }
+                    .bg-blue { background-color: #D6EAF8; }
+                    .bg-yellow { background-color: #FCF3CF; }
+                    .bg-orange { background-color: #FDEBD0; }
+                    .bg-red { background-color: #FADBD8; }
+                    .bg-gold { background-color: #FBF7E8; }
+                    ul { margin-top: 4px; margin-bottom: 12px; }
+                    li { margin-bottom: 6px; font-size: 10.5pt; }
+                </style>
+            </head>
+            <body>
+                <div class="banner">
+                    <h1>${title}</h1>
+                    <p>${subtitle}</p>
+                </div>
+                ${bodyContent}
+            </body>
+            </html>`;
+        }
+
+        function downloadWordDoc(docType) {
+            let filename = '';
+            let htmlContent = '';
+
+            if (docType === 'summary') {
+                filename = 'MHEWS_Assignment_Summary_and_Action_Plan.doc';
+                const body = `
+                    <h2>1. ملخص النقاط الأساسية للمهمة (ما يجب معرفته)</h2>
+                    <ul>
+                        <li><strong>الهدف والجهة المستفيدة:</strong> مهمة استشارية وتدريبية مع مكتب الأمم المتحدة لخدمات المشاريع (UNOPS) لدعم وزارة الطوارئ وإدارة الكوارث في سوريا (MoEDM) في تطوير عتبات الإنذار المبكر المبني على الأثر وإجراءات التفعيل لنظام الإنذار المبكر متعدد المخاطر (MHEWS).</li>
+                        <li><strong>المنصة التقنية المعتمدة:</strong> العمل يتم بالكامل على المنصة القائمة حالياً لدى الوزارة (WMO ClimWeb + CAP) دون الحاجة لأي منصة جديدة.</li>
+                        <li><strong>تفاصيل التدريب:</strong> 5 أيام تدريبية في دمشق (منفصلة عن أيام الاستشارة الفنية)، تستهدف حتى 20 متدرباً من الكوادر الفنية في الوزارة والمؤسسات الوطنية والمتطوعين المختارين.</li>
+                        <li><strong>تكوين الفريق:</strong> خبيران رئيسيان: (1) القائد التقني للعتبات وإجراءات التشغيل القياسية (SOPs)، و(2) مدرب تدريب المدربين (ToT) للحد من مخاطر الكوارث والاستعداد المجتمعي باللغة العربية.</li>
+                    </ul>
+                    <h2>2. الأنظمة التقنية المعتمدة والروابط المباشرة</h2>
+                    <table>
+                        <thead>
+                            <tr><th>النظام / البروتوكول</th><th>الدور التشغيلي في المشروع</th><th>الرابط المباشر</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>WMO ClimWeb</strong></td><td>نظام إدارة المعلومات المناخية لعرض معلومات المخاطر، الخرائط، وإصدار التنبيهات.</td><td>https://climweb.readthedocs.io/</td></tr>
+                            <tr class="bg-gold"><td><strong>Common Alerting Protocol (CAP v1.2)</strong></td><td>بروتوكول التنبيه المشترك لتوليد ونشر التحذيرات وتعميمها عبر المنصة.</td><td>https://docs.oasis-open.org/emergency/cap/v1.2/CAP-v1.2-os.html</td></tr>
+                            <tr><td><strong>مبادرة الإنذار المبكر للجميع (WMO EW4All)</strong></td><td>الإطار المرجعي لتطوير أنظمة الإنذار المبكر متعددة المخاطر (MHEWS).</td><td>https://wmo.int/activities/early-warnings-all</td></tr>
+                            <tr class="bg-gold"><td><strong>بوابة UNOPS الرسمية</strong></td><td>بوابة مكتب الأمم المتحدة لخدمات المشاريع لإدارة المهمات الاستشارية.</td><td>https://jobs.unops.org/</td></tr>
+                        </tbody>
+                    </table>
+                    <h2>3. قائمة المهام والخطوات العملية حسب الدور</h2>
+                    <table>
+                        <thead>
+                            <tr><th>الدور الوظيفي</th><th>المهمة الرئيسية</th><th>المخرجات العملية المطلوبة</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>القائد التقني (Technical Lead)</strong></td><td>تطوير واعتماد العتبات التشغيلية</td><td>تحديد عتبات لـ 6 مخاطر: الجفاف، السيول، حرائق الغابات، العواصف الرملية، موجات الحر، والعواصف الرياحية.</td></tr>
+                            <tr class="bg-gold"><td><strong>القائد التقني (Technical Lead)</strong></td><td>بناء مصفوفة الإنذار</td><td>إعداد مصفوفة (العتبة – الأثر – الإجراء) للمستويات اللونية الأربعة (الأزرق، الأصفر، البرتقالي، الأحمر).</td></tr>
+                            <tr><td><strong>القائد التقني (Technical Lead)</strong></td><td>إعداد الأدلة والإجراءات (SOPs)</td><td>صياغة دليل تفعيل الإنذار المبكر وإجراءات التشغيل القياسية شاملة محفزات التفعيل، المسؤوليات، والتصعيد.</td></tr>
+                            <tr class="bg-gold"><td><strong>مدرب تدريب المدربين (DRR ToT Trainer)</strong></td><td>تصميم وقيادة تدريب المدربين</td><td>إعداد الحقيبة التدريبية باللغة العربية وقيادة التدريب لمدة 5 أيام في دمشق.</td></tr>
+                            <tr><td><strong>مدرب تدريب المدربين (DRR ToT Trainer)</strong></td><td>بناء السيناريوهات التطبيقية والتقييم</td><td>تحويل العتبات وSOPs إلى سيناريوهات سورية واقعية، وإجراء التقييم القبلي والبعدي وتوصيات المجتمع.</td></tr>
+                        </tbody>
+                    </table>
+                `;
+                htmlContent = wrapWordHtml('ملخص المهمة الاستشارية وخطة العمل التنفيذية (MHEWS)', 'دعم وزارة الطوارئ وإدارة الكوارث في سوريا (MoEDM) – مكتب الأمم المتحدة لخدمات المشاريع (UNOPS)', body);
+            } else if (docType === 'matrix') {
+                filename = 'MHEWS_Threshold_Impact_Action_Matrix.doc';
+                let hazardsTablesHtml = hazardsMatrixData.map(h => `
+                    <h2>${h.title}</h2>
+                    <p><strong>المؤشرات المعتمدة:</strong> ${h.indicators}</p>
+                    <table>
+                        <thead>
+                            <tr><th>المستوى</th><th>العتبة الفنية (Threshold)</th><th>الأثر المتوقع (Expected Impact)</th><th>الإجراء المؤسسي والمجتمعي (Action / SOP)</th></tr>
+                        </thead>
+                        <tbody>
+                            ${h.rows.map((r, idx) => {
+                                const cls = idx === 0 ? 'bg-blue' : (idx === 1 ? 'bg-yellow' : (idx === 2 ? 'bg-orange' : 'bg-red'));
+                                return `<tr class="${cls}"><td><strong>${r.level}</strong></td><td>${r.threshold}</td><td>${r.impact}</td><td>${r.action}</td></tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                `).join('');
+                htmlContent = wrapWordHtml('مصفوفة (العتبة – الأثر – الإجراء) لنظام الإنذار المبكر (MHEWS)', 'المستويات اللونية الأربعة (أزرق، أصفر، برتقالي، أحمر) للمخاطر الستة ومتطلبات بروتوكول CAP', hazardsTablesHtml);
+            } else if (docType === 'scenarios') {
+                filename = 'MHEWS_Tabletop_Simulation_Scenarios.doc';
+                let scHtml = scenariosData.map(s => `
+                    <h2>${s.title}</h2>
+                    <p><strong>السياق الجغرافي والموسمي:</strong> ${s.context}</p>
+                    <p><strong>العناصر المعرضة للخطر:</strong> ${s.elements}</p>
+                    <table>
+                        <thead>
+                            <tr><th>المرحلة الزمنية</th><th>معطيات الرصد (Injects)</th><th>القرار الفني المطلوب (CAP)</th><th>الإجراءات التشغيلية والمجتمعية (SOPs)</th></tr>
+                        </thead>
+                        <tbody>
+                            ${s.stages.map((st, idx) => {
+                                const cls = idx === 0 ? 'bg-yellow' : (idx === 1 ? 'bg-orange' : 'bg-red');
+                                return `<tr class="${cls}"><td><strong>${st.stage}</strong></td><td>${st.inject}</td><td><strong>${st.decision}</strong></td><td>${st.sops}</td></tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                    <p><strong>المخرج التطبيقي المطلوب:</strong> ${s.output}</p>
+                `).join('');
+                htmlContent = wrapWordHtml('دليل سيناريوهات المحاكاة التدريبية المكتبية (Tabletop Exercises - TTX)', 'تطبيق مصفوفة الإنذار المبكر ومنصة ClimWeb وبروتوكول CAP – تدريب دمشق', scHtml);
+            } else if (docType === 'worksheet_blank' || docType === 'worksheet_filled') {
+                const isFilled = docType === 'worksheet_filled';
+                filename = isFilled ? 'MHEWS_Trainee_Worksheet_Filled.doc' : 'MHEWS_Trainee_Exercise_Worksheet.doc';
+                const g = isFilled ? document.getElementById('ws-group').value : '....................................................................................';
+                const sc = isFilled ? document.getElementById('ws-scenario').value : '[  ] السيول والفيضانات   |   [  ] حرائق الغابات   |   [  ] العواصف الرملية';
+                const inj = isFilled ? document.getElementById('ws-inject').value : '[  ] المرحلة 1 (قبل الحدث)   |   [  ] المرحلة 2 (تطور الخطر)   |   [  ] المرحلة 3 (الذروة)';
+                const tm = isFilled ? document.getElementById('ws-time').value : '....................................................................................';
+                const ind = isFilled ? document.getElementById('ws-indicators').value : '........................................................................................................................';
+                const col = isFilled ? document.getElementById('ws-color').value : '[  ] أزرق (مراقبة)   |   [  ] أصفر (تحذير مبكر)   |   [  ] برتقالي (تأهب قصوى)   |   [  ] أحمر (طوارئ)';
+                const just = isFilled ? document.getElementById('ws-justification').value : '........................................................................................................................';
+                const urg = isFilled ? document.getElementById('ws-urgency').value : '[  ] Immediate   |   [  ] Expected   |   [  ] Future';
+                const sev = isFilled ? document.getElementById('ws-severity').value : '[  ] Extreme   |   [  ] Severe   |   [  ] Moderate   |   [  ] Minor';
+                const cert = isFilled ? document.getElementById('ws-certainty').value : '[  ] Observed   |   [  ] Likely   |   [  ] Possible';
+                const area = isFilled ? document.getElementById('ws-area').value : '........................................................................................................................';
+                const head = isFilled ? document.getElementById('ws-headline').value : '........................................................................................................................';
+                const desc = isFilled ? document.getElementById('ws-desc').value : '........................................................................................................................';
+                const inst = isFilled ? document.getElementById('ws-instruction').value : '........................................................................................................................';
+                const sops = isFilled ? document.getElementById('ws-sops').value : '........................................................................................................................';
+                const sms = isFilled ? document.getElementById('ws-sms').value : '........................................................................................................................';
+                const esc = isFilled ? document.getElementById('ws-escalation').value : '........................................................................................................................';
+
+                const wsBody = `
+                    <h2>القسم الأول: بيانات الجلسة والمجموعة</h2>
+                    <table>
+                        <tr><td width="30%" class="bg-gold"><strong>رقم / اسم المجموعة التدريبية</strong></td><td>${g}</td></tr>
+                        <tr><td class="bg-gold"><strong>السيناريو قيد التطبيق</strong></td><td>${sc}</td></tr>
+                        <tr><td class="bg-gold"><strong>المرحلة الزمنية (Inject)</strong></td><td>${inj}</td></tr>
+                        <tr><td class="bg-gold"><strong>التوقيت الافتراضي للحدث</strong></td><td>${tm}</td></tr>
+                    </table>
+                    <h2>القسم الثاني: تحليل الرصد وتحديد مستوى الإنذار (المصفوفة)</h2>
+                    <table>
+                        <tr><td width="30%" class="bg-gold"><strong>المؤشرات الفنية المرصودة</strong></td><td>${ind}</td></tr>
+                        <tr><td class="bg-gold"><strong>قرار مستوى الإنذار اللوني</strong></td><td><strong>${col}</strong></td></tr>
+                        <tr><td class="bg-gold"><strong>مبرر اختيار المستوى</strong></td><td>${just}</td></tr>
+                    </table>
+                    <h2>القسم الثالث: إعداد رسالة بروتوكول التنبيه المشترك (CAP) لمنصة ClimWeb</h2>
+                    <table>
+                        <tr><td width="30%" class="bg-gold"><strong>الاستعجال &lt;urgency&gt;</strong></td><td>${urg}</td></tr>
+                        <tr><td class="bg-gold"><strong>الشدة &lt;severity&gt;</strong></td><td>${sev}</td></tr>
+                        <tr><td class="bg-gold"><strong>الموثوقية &lt;certainty&gt;</strong></td><td>${cert}</td></tr>
+                        <tr><td class="bg-gold"><strong>النطاق الجغرافي &lt;areaDesc&gt;</strong></td><td>${area}</td></tr>
+                        <tr><td class="bg-gold"><strong>عنوان التحذير &lt;headline&gt;</strong></td><td>${head}</td></tr>
+                        <tr><td class="bg-gold"><strong>وصف الأثر المتوقع &lt;description&gt;</strong></td><td>${desc}</td></tr>
+                        <tr><td class="bg-gold"><strong>التعليمات والإجراءات &lt;instruction&gt;</strong></td><td>${inst}</td></tr>
+                    </table>
+                    <h2>القسم الرابع والخامس: الإجراءات التشغيلية (SOPs)، رسالة SMS، والتصعيد</h2>
+                    <table>
+                        <tr><td width="30%" class="bg-gold"><strong>الإجراءات الاستباقية والميدانية</strong></td><td>${sops}</td></tr>
+                        <tr><td class="bg-gold"><strong>رسالة قصيرة للجمهور (SMS)</strong></td><td>${sms}</td></tr>
+                        <tr><td class="bg-gold"><strong>قرار التصعيد وقنوات البث</strong></td><td>${esc}</td></tr>
+                    </table>
+                    <h2>القسم السادس: بطاقة تقييم المدرب السريع (من 20 درجة)</h2>
+                    <table>
+                        <thead>
+                            <tr><th>معيار التقييم</th><th>الدرجة (من 5)</th><th>ملاحظات المدرب</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1. مطابقة اللون المختار مع العتبة الرقمية</td><td>.... / 5</td><td>........................................................</td></tr>
+                            <tr><td>2. سلامة واتساق حقول CAP (Severity/Urgency)</td><td>.... / 5</td><td>........................................................</td></tr>
+                            <tr><td>3. وضوح صياغة الأثر والإجراء باللغة العربية</td><td>.... / 5</td><td>........................................................</td></tr>
+                            <tr><td>4. كفاءة خطة العمل الاستباقي وإشراك المجتمع</td><td>.... / 5</td><td>........................................................</td></tr>
+                            <tr class="bg-gold"><td><strong>المجموع الكلي للمرحلة</strong></td><td><strong>.... / 20</strong></td><td>توقيع المقيم: ....................................</td></tr>
+                        </tbody>
+                    </table>
+                `;
+                htmlContent = wrapWordHtml('استمارة عمل المتدربين: تمرين محاكاة تفعيل نظام الإنذار المبكر (MHEWS)', 'وزارة الطوارئ وإدارة الكوارث في سوريا (MoEDM) – بالتعاون مع UNOPS', wsBody);
+            }
+
+            const blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showToast('تم تجهيز ملف الوورد بنجاح', `تم بدء تحميل: ${filename}`);
+        }
+
+        // Initialize Page on Load
+        window.onload = function() {
+            filterHazard('all');
+            renderScenarios();
+            updateCapXmlPreview();
+            updateSmsCount();
+            calcTotalScore();
+        };
+    </script>
+</body>
+</html>
